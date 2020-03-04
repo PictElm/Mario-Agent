@@ -39,8 +39,8 @@ public class AgentTest {
 
     public static void main(String[] args) {
         MarioGame game = new MarioGame();
-
         String level = AgentTest.getLevel("tests/lvl-1.txt");
+
         BaseAgent agent = new ExperimentAgent(new RandomAction(30), new Recorder());
 
         //printResults(game.playGame(level, 200, 0));

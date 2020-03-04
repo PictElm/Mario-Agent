@@ -3,7 +3,8 @@ package environnement;
 import org.marioai.engine.helper.MarioActions;
 
 /**
- * Contains a list of actions to perform.
+ * Contains a list of button to press.
+ * <p>Each frame is as follow: { Left, Right, Down, Speed, Jump }.
  */
 public class Action {
 
@@ -60,6 +61,10 @@ public class Action {
         return r.toString();
     }
 
+    /**
+     * Used to create a new Action with inputs from a string of space-separated bit-fields list.
+     * @param c space-separated list of inputs.
+     */
     private static boolean[][] parseInput(String c) {
         boolean[][] r;
 

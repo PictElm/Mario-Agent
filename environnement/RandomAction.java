@@ -39,26 +39,40 @@ public class RandomAction extends Random {
         this.maxNbFrames = maxNbFrames;
     }
 
+    /**
+     * Create a random action generator.
+     * @param nbFrames exact amount of frames in an action.
+     */
     public RandomAction(int nbFrames) {
         this(nbFrames, nbFrames + 1);
     }
 
+    /**
+     * Used to generate the first button combination of the sequence.
+     * @param nbInputs number of button that can be pressed.
+     * @return a random list of boolean.
+     */
     protected boolean[] nextInputs(int nbInputs) {
-        return new boolean[] { false, true, false, false, false };
-        // boolean[] r = new boolean[nbInputs];
-
-        // int pressed = super.next(nbInputs);
-        // for (int button = 0; button < nbInputs; button++)
-        //     r[button] = ((1 << button) & pressed) != 0;
-
-        // return r;
-    }
-
-    protected boolean[] nextInputs(int nbInputs, boolean[] input) {
         boolean[] r = new boolean[nbInputs];
 
+        int pressed = super.next(nbInputs);
         for (int button = 0; button < nbInputs; button++)
-            r[button] = input[button] ^ (super.nextFloat() < .01);
+            r[button] = ((1 << button) & pressed) != 0;
+
+        return r;
+    }
+
+    /**
+     * Used to generate a logical followup to the given input.
+     * @see RandomAction.nextAction()
+     * @param input previous frame's inputs.
+     * @return a random (biased) list of boolean.
+     */
+    protected boolean[] nextInputs(boolean[] input) {
+        boolean[] r = new boolean[input.length];
+
+        for (int button = 0; button < input.length; button++)
+            r[button] = input[button] ^ (super.nextFloat() < .05);
 
         // right and left cannot be pressed at the same time
         if (r[0] && r[1])
@@ -70,9 +84,9 @@ public class RandomAction extends Random {
     /**
      * Returns a new list of inputs following restrictions:
      * <ul>
-     * <li>coucou
+     *   <li>a button is more likely to keep its state from one frame the next
+     *   <li>right and left cannot be pressed at the same time
      * </ul>
-     * <p>coucou
      * @return a random Action.
      */
     public Action nextAction() {
@@ -82,9 +96,9 @@ public class RandomAction extends Random {
 
         inputs[0] = this.nextInputs(nbInputs);
         for (int frame = 1; frame < nbFrames; frame++)
-            inputs[frame] = this.nextInputs(nbInputs, inputs[frame - 1]);
+            inputs[frame] = this.nextInputs(inputs[frame - 1]);
 
-        return  new Action(inputs);
+        return new Action(inputs);
     }
 
 }

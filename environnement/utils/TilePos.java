@@ -1,5 +1,8 @@
 package environnement.utils;
 
+/**
+ * A basic (x, y) int-vector.
+ */
 public class TilePos {
 
     public int x;
