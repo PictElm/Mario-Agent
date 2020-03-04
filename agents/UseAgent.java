@@ -1,13 +1,13 @@
 package agents;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Queue;
-
-import org.marioai.engine.core.MarioForwardModel;
 
 import agents.meta.Statistics;
 import environnement.Action;
 import environnement.Description;
+import environnement.ForwardModel;
 import environnement.repository.BaseRepository;
 import environnement.utils.TilePos;
 
@@ -28,26 +28,30 @@ public class UseAgent extends BaseAgent {
 
     /**
      * Tries to find a position at which the description's grid is a sub-matrix of the scene.
-     * TODO: if it exists multiple times, should only focus on the most reWeight-ed one.
      * @param d description which grid is to be found.
      * @param scene a grid to search into.
      * @return a TilePos at the position or null if not found.
      */
-    protected static TilePos fitDescription(Description d, int[][] scene) {
+    protected static TilePos[] fitDescription(Description d, int[][] scene) {
+        ArrayList<TilePos> r = new ArrayList<>();
+
         for (int x = 0; x < scene.length - d.width + 1; x++) {
             for (int y = 0; y < scene[x].length - d.height + 1; y++) {
                 int i = 0;
                 int j = 0;
                 while (scene[x + i][y + j] == d.getAt(i, j) || d.getAt(i, j) < 0) {
                     if (d.height - 1 < ++j) {
-                        if (d.width - 1 < ++i)
-                            return new TilePos(x, y);
+                        if (d.width - 1 < ++i) {
+                            r.add(new TilePos(x, y));
+                            break;
+                        }
                         j = 0;
                     }
                 }
             }
         }
-        return null;
+
+        return r.toArray(new TilePos[r.size()]);
     }
 
     protected static float reWeight(Description d, TilePos fit) {
@@ -56,13 +60,16 @@ public class UseAgent extends BaseAgent {
 
     /**
      * Attempts to describe the given scene using as many description element as the length of to.
-     * Result are store in the given parameter to.
+     * Result of the description are stored in the given parameters.
      * @param scene scene to describe.
      * @param to list to store results into.
-     * @return reevaluated weight for corresponding description in the result.
+     * @param r list to store reWeighted values (or null).
+     * @param at list to store found locations (or null).
+     * @return true if it was able to describe the environnement.
      */
-    protected float[] describeEnvironnement(int[][] scene, Description[] to) {
-        float[] r = new float[to.length];
+    protected boolean describeEnvironnement(int[][] scene, Description[] to, float[] r, TilePos[] at) {
+        if (r == null) r = new float[to.length];
+        if (at == null) at = new TilePos[to.length];
 
         int fitted = 0;
         int skip = 0;
@@ -83,21 +90,24 @@ public class UseAgent extends BaseAgent {
             if (next == null) break;
 
             // try to fit the description to the current scene
-            TilePos fit = fitDescription(next, scene);
+            TilePos[] fittingPos = UseAgent.fitDescription(next, scene);
             // if it's able to, complete the `to` list and re-evaluate weight with fit position
-            if (fit != null) {
+            if (0 < fittingPos.length) {
+                // find the best location for the description
+                int localBest = 0;
+                for (int k = 1; k < fittingPos.length; k++)
+                    if (UseAgent.reWeight(next, fittingPos[localBest]) < UseAgent.reWeight(next, fittingPos[k]))
+                        localBest = k;
+
                 to[fitted] = next;
-                r[fitted++] = UseAgent.reWeight(next, fit);
+                at[fitted] = fittingPos[localBest];
+                r[fitted++] = UseAgent.reWeight(next, fittingPos[localBest]);
             }
 
         // until enough descriptions are found to match requirement
         } while (fitted < to.length);
 
-        // if no fitting descriptions was found, add at least an empty description (~ waiting)
-        if (fitted == 0)
-            to[0] = new Description("", 0, 0, ++r[0], 0, "0");
-
-        return r;
+        return 0 < fitted;
     }
 
     /**
@@ -110,26 +120,36 @@ public class UseAgent extends BaseAgent {
      * <p>Pick is stored in this.current.
      * @param model access to game state.
      */
-    protected void findNewAction(MarioForwardModel model) {
+    protected void findNewAction(ForwardModel model) {
+        // make sure to properly free the previous action
+        if (this.current != null) this.current.reset();
+
         // query the 3 first fitting descriptions, result in `result`
         Description[] result = new Description[3];
-        float[] weighted = this.describeEnvironnement(model.getScreenSceneObservation(), result);
+        float[] weighted = new float[result.length];
+        TilePos[] foundAt = new TilePos[result.length];
+        boolean wasAbleTo = this.describeEnvironnement(model.getScreenSceneObservation(), result, weighted, foundAt);
 
-        // find the most weighted one
-        int max = 0;
-        for (int k = 0; k < weighted.length; k++)
-            if (weighted[max] < weighted[k])
-                max = k;
+        if (wasAbleTo) {
+            // find the most weighted one
+            int max = 0;
+            for (int k = 0; k < weighted.length; k++)
+                if (weighted[max] < weighted[k])
+                    max = k;
 
-        // set the current action
-        this.current = result[max].getAction();
+            // set it as the current action and report choice for statistics
+            this.current = result[max].getAction();
+            if (this.stat != null) this.stat.choiceReport(result, max);
 
-        // report choice for statistics
-        if (this.stat != null) this.stat.choiceReport(result, max);
+        } else {
+            // if no fitting description was found, do nothing
+            this.current = new Action("0"); // FIXME: will result in doing so endlessly
+            if (this.stat != null) this.stat.statusReport(Statistics.Status.DEAD_END);
+        }
     }
 
     @Override
-    public boolean[] feed(MarioForwardModel model) {
+    public boolean[] feed(ForwardModel model) {
         // if no current action or previous action is finished, find a new one
         if (this.current == null || this.current.finished())
             this.findNewAction(model);
@@ -139,6 +159,11 @@ public class UseAgent extends BaseAgent {
 
         // consume the current action
         return this.current.consume();
+    }
+
+    @Override
+    public String getAgentName() {
+        return super.getAgentName() + " [Use]";
     }
 
 }

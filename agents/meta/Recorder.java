@@ -1,13 +1,18 @@
 package agents.meta;
 
-import org.marioai.engine.core.MarioForwardModel;
+import java.util.ArrayList;
 
 import environnement.Action;
+import environnement.Description;
+import environnement.ForwardModel;
+import environnement.utils.TilePos;
 
 public class Recorder {
 
+    private ArrayList<Description> records;
+
     public Recorder() {
-        ;
+        this.records = new ArrayList<>();
     }
 
     /**
@@ -15,8 +20,13 @@ public class Recorder {
      * @param action action that will be used.
      * @param model current environnement.
      */
-    public void feedAction(Action action, MarioForwardModel model) {
-        ;
+    public void feedAction(Action action, ForwardModel model) {
+        Description d = new Description(model.getScreenSceneObservation(), new TilePos(), 0, 0, action);
+        this.records.add(d);
+    }
+
+    public Description[] getRecords() {
+        return this.records.toArray(new Description[this.records.size()]);
     }
 
 }

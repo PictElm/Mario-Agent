@@ -23,15 +23,16 @@ public class UseAgentTest extends UseAgent {
 
     public void testFitDescription() {
         Description d = super.prov.getFirst(1)[0];
-        TilePos r = UseAgent.fitDescription(d, this.testScene);
+        TilePos[] r = UseAgent.fitDescription(d, this.testScene);
 
         System.out.println(d);
-        System.out.println(r);
+        System.out.println(r[0]);
     }
 
     public void testDescribeEnvironnement() {
         Description[] result = new Description[3];
-        float[] weighted = super.describeEnvironnement(this.testScene, result);
+        float[] weighted = new float[result.length];
+        describeEnvironnement(this.testScene, result, weighted, null);
 
         for (int k = 0; k < result.length; k++) {
             System.out.print(weighted[k]);

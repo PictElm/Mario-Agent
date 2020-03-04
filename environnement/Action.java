@@ -41,7 +41,11 @@ public class Action {
      * @return true if there is no input left to consume.
      */
     public boolean finished() {
-        return this.length <= this.current;
+        return this.length - 1 < this.current;
+    }
+
+    public void reset() {
+        this.current = 0;
     }
 
     @Override
@@ -55,7 +59,7 @@ public class Action {
                 n = (n << 1) + (bp[i] ? 1 : 0);
 
             r.append(sep).append(n);
-            sep = ",";
+            sep = " ";
         }
 
         return r.toString();

@@ -4,6 +4,11 @@ import environnement.Description;
 
 public abstract class BaseRepository {
 
+    /**
+     * Get the n-th element. Should be null if n is not a valid id.
+     * @param n id of the element to get.
+     * @return the element or null.
+     */
     protected abstract Description getNth(int n);
 
     /**

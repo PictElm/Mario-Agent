@@ -1,9 +1,8 @@
 package agents;
 
-import org.marioai.engine.core.MarioForwardModel;
-
 import agents.meta.Recorder;
 import environnement.Action;
+import environnement.ForwardModel;
 import environnement.RandomAction;
 
 /**
@@ -22,17 +21,23 @@ public class ExperimentAgent extends BaseAgent {
     }
 
     @Override
-    public boolean[] feed(MarioForwardModel model) {
+    public boolean[] feed(ForwardModel model) {
         // if no current action or previous action is finished, ask for a new random one
         if (this.current == null || this.current.finished()) {
             this.current = this.action.nextAction();
 
             // record inputs
-            if (this.rec != null) this.rec.feedAction(this.current, model);
+            if (this.rec != null)
+                this.rec.feedAction(this.current, model);
         }
 
         // consume the current action
         return this.current.consume();
+    }
+
+    @Override
+    public String getAgentName() {
+        return super.getAgentName() + " [Experiment]";
     }
 
 }
