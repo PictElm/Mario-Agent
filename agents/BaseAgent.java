@@ -17,7 +17,7 @@ public abstract class BaseAgent implements MarioAgent {
 
     @Override
     public void initialize(MarioForwardModel model, MarioTimer timer) {
-        System.out.println("BaseAgent.initialize (name: " + this.getAgentName() + " - class: " + this.getClass() + ")");
+        System.out.println("BaseAgent.initialize (name: " + this.getAgentName() + " - " + this.getClass() + ")");
     }
 
     @Override

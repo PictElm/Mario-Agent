@@ -57,6 +57,14 @@ public class Description {
     }
 
     /**
+     * Returns the entire description's grid.
+     * @return grid.
+     */
+    public int[][] getGrid() {
+        return this.grid;
+    }
+
+    /**
      * Returns the action to perform when this description is found by the agent.
      * @return the associated action.
      */

@@ -7,10 +7,8 @@ import java.nio.file.Paths;
 import org.marioai.engine.core.MarioGame;
 import org.marioai.engine.core.MarioResult;
 
-import agents.BaseAgent;
-import agents.ExperimentAgent;
-import agents.meta.Recorder;
-import environnement.RandomAction;
+import agents.UseAgent;
+import environnement.repository.FileRepository;
 
 public class AgentTest {
 
@@ -24,27 +22,16 @@ public class AgentTest {
         System.out.println("****************************************************************");
     }
 
-    public static String getLevel(String filepath) {
-        String r = "";
-
-        try {
-            r = new String(Files.readAllBytes(Paths.get(filepath)));
-        } catch (IOException e) {
-            System.out.println(e);
-            System.exit(4);
-        }
-
-        return r;
-    }
-
     public static void main(String[] args) {
-        MarioGame game = new MarioGame();
-        String level = AgentTest.getLevel("tests/lvl-1.txt");
-
-        BaseAgent agent = new ExperimentAgent(new RandomAction(30), new Recorder());
-
-        //printResults(game.playGame(level, 200, 0));
-        printResults(game.runGame(agent, level, 20, 0, true));
+        try {
+            AgentTest.printResults(new MarioGame().runGame(
+                new UseAgent(new FileRepository(Paths.get("./tests/generated.txt")), null),
+                new String(Files.readAllBytes(Paths.get("tests/lvl-1.txt"))),
+                20, 0, true
+            ));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 }

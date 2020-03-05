@@ -3,6 +3,10 @@ package tests;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map.Entry;
 
 import org.marioai.engine.core.MarioGame;
 import org.marioai.engine.core.MarioResult;
@@ -10,6 +14,7 @@ import org.marioai.engine.core.MarioResult;
 import agents.BaseAgent;
 import agents.UseAgent;
 import agents.meta.Statistics;
+import environnement.Description;
 import environnement.repository.FileRepository;
 
 public class UsageTest {
@@ -38,13 +43,13 @@ public class UsageTest {
 
     public static void main(String[] args) {
         MarioGame game = new MarioGame();
-        String level = AgentTest.getLevel("tests/lvl-1.txt");
+        String level = UsageTest.getLevel("tests/lvl-1.txt");
 
         // record the choices made to determine most interesting descriptions
         Statistics rec = new Statistics();
         BaseAgent agent;
         try {
-            // use the description loaded in the FileRepository to make choices
+            // use the descriptions loaded in the FileRepository to make choices
             agent = new UseAgent(new FileRepository(Paths.get("./tests/generated.txt")), rec);
 
             game.runGame(agent, level, 20, 0, true);
@@ -52,7 +57,10 @@ public class UsageTest {
             e.printStackTrace();
         }
 
-        System.out.println("Best choice was: " + rec.getBest().getAction() + " (+" + 100 * rec.getBestPercent() + ")");
+        List<Entry<Description, ArrayList<Float>>> bests = rec.getBests(3);
+        System.out.println("Best 3 choices were: ");
+        for (Entry<Description, ArrayList<Float>> it : bests)
+            System.out.println("\t'" + it.getKey().getAction() + "' (up to +" + 100 * Collections.max(it.getValue()) + "%)");
     }
 
 }

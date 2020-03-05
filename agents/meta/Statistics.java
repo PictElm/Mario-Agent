@@ -1,5 +1,12 @@
 package agents.meta;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import environnement.Description;
 import environnement.ForwardModel;
 
@@ -9,11 +16,10 @@ public class Statistics {
     private Description choice;
     private Description previous;
 
-    private Description best;
-    private float bestPercent;
+    private HashMap<Description, ArrayList<Float>> records;
 
     public Statistics() {
-        ;
+        this.records = new HashMap<>();
     }
 
     /**
@@ -26,12 +32,16 @@ public class Statistics {
             float diff = newPercent - this.percent;
 
             System.out.print((diff < 0 ? "" : "+") + 100 * diff + "% by doing: '");
-            System.out.println(this.previous.getAction() + "'");
+            System.out.print(this.previous.getAction() + "'");
 
-            if (this.bestPercent < diff) {
-                this.best = this.previous;
-                this.bestPercent = diff;
-            }
+            ArrayList<Float> gains = this.records.get(this.previous);
+            if (gains == null) {
+                gains = new ArrayList<>();
+                this.records.put(this.previous, gains);
+                System.out.println();
+            } else
+                System.out.println(" (for the " + (gains.size() + 1) + "th time)");
+            gains.add(diff);
 
             this.percent = newPercent;
             this.previous = null;
@@ -60,12 +70,42 @@ public class Statistics {
         DEAD_END
     }
 
-    public Description getBest() {
-        return this.best;
+    /**
+     * Returns the best entry in the records as a 'pair' of a Description and the gains in percent.
+     * @return the best entry in records.
+     */
+    public Map.Entry<Description, ArrayList<Float>> getBest() {
+        Map.Entry<Description, ArrayList<Float>> r = null;
+
+        float best = -1f;
+        for (Map.Entry<Description, ArrayList<Float>> pair : this.records.entrySet()) {
+            float max = Collections.max(pair.getValue());
+            if (best < max) {
+                r = pair;
+                best = max;
+            }
+        }
+
+        return r;
     }
 
-    public float getBestPercent() {
-        return this.bestPercent;
+    /**
+     * Returns the best entries in the records as a list of 'pairs' of a Description and the gains in percent.
+     * @return the best entry in records.
+     */
+    public List<Entry<Description, ArrayList<Float>>> getBests() {
+        ArrayList<Entry<Description, ArrayList<Float>>> r = new ArrayList<>(this.records.entrySet());
+        r.sort((Entry<Description, ArrayList<Float>> e1, Entry<Description, ArrayList<Float>> e2) -> Collections.max(e1.getValue()) < Collections.max(e2.getValue()) ? 1 : -1);
+        return r;
+    }
+
+    /**
+     * Returns the n best entries in the records as a list of 'pairs' of a Description and the gains in percent.
+     * @param n number of entries to return
+     * @return the best entry in records.
+     */
+    public List<Entry<Description, ArrayList<Float>>> getBests(int n) {
+        return this.getBests().subList(0, n);
     }
 
 }

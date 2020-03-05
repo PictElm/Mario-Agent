@@ -40,7 +40,7 @@ public class GenerationTest {
 
     public static void main(String[] args) {
         MarioGame game = new MarioGame();
-        String level = AgentTest.getLevel("tests/lvl-1.txt");
+        String level = GenerationTest.getLevel("tests/lvl-1.txt");
 
         // create a random agent and record its actions
         Recorder rec = new Recorder();
