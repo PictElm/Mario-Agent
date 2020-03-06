@@ -4,9 +4,25 @@ import org.marioai.engine.core.MarioAgent;
 import org.marioai.engine.core.MarioForwardModel;
 import org.marioai.engine.core.MarioTimer;
 
+import environnement.Action;
 import environnement.ForwardModel;
 
 public abstract class BaseAgent implements MarioAgent {
+
+    private Action currentAction;
+
+    protected Action getCurrent() {
+        return this.currentAction;
+    }
+
+    protected void setCurrent(Action a) {
+        a.reset();
+        this.currentAction = a;
+    }
+
+    protected boolean hasCurrent() {
+        return this.currentAction != null && !this.currentAction.finished();
+    }
 
     /**
      * Ask the agent for input given the game state.

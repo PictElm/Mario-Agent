@@ -1,6 +1,8 @@
 package environnement.repository;
 
+import environnement.Action;
 import environnement.Description;
+import environnement.utils.TilePos;
 
 public abstract class BaseRepository {
 
@@ -10,6 +12,12 @@ public abstract class BaseRepository {
      * @return the element or null.
      */
     protected abstract Description getNth(int n);
+    public abstract Description getAny();
+
+    public abstract void add(Description d);
+    public abstract void remove(Description d);
+
+    public abstract int count();
 
     /**
      * Get the n first element after skipping skip element.
@@ -35,6 +43,22 @@ public abstract class BaseRepository {
      */
     public Description[] getFirst(int n) {
         return this.getFirst(n, 0);
+    }
+
+    public Description newDescription(int[][] grid, TilePos location, Action action) {
+        return new Description(grid, location, 0, 0, action, BaseRepository.newDescriptionTag());
+    }
+
+    private static int descriptionTagCounter = 0;
+    protected static String newDescriptionTag() {
+        char c = 26 * 26 < BaseRepository.descriptionTagCounter ? 'a' : 'A';
+        return "" + (char) (c + (int) (BaseRepository.descriptionTagCounter / 26)) + (char) (c + (int) (BaseRepository.descriptionTagCounter % 26));
+    }
+
+    private static int actionTagCounter = 0;
+    protected static String newActionTag() {
+        char c = 26 * 26 < BaseRepository.actionTagCounter ? 'a' : 'A';
+        return "" + (char) (c + (int) (BaseRepository.actionTagCounter / 26)) + (char) (c + (int) (BaseRepository.actionTagCounter % 26));
     }
 
 }

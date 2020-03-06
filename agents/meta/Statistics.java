@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import agents.visual.StatVisual;
 import environnement.Description;
 import environnement.ForwardModel;
 
@@ -18,8 +19,16 @@ public class Statistics {
 
     private HashMap<Description, ArrayList<Float>> records;
 
-    public Statistics() {
+    private StatVisual visual;
+
+    public Statistics(boolean visual) {
         this.records = new HashMap<>();
+
+        if (visual) this.visual = new StatVisual();
+    }
+
+    public Statistics() {
+        this(false);
     }
 
     /**
@@ -31,16 +40,15 @@ public class Statistics {
             float newPercent = model.getCompletionPercentage();
             float diff = newPercent - this.percent;
 
-            System.out.print((diff < 0 ? "" : "+") + 100 * diff + "% by doing: '");
-            System.out.print(this.previous.getAction() + "'");
+            //System.out.print((diff < 0 ? "" : "+") + 100 * diff + "% by doing: '");
+            //System.out.print(this.previous.getAction() + "'");
 
             ArrayList<Float> gains = this.records.get(this.previous);
             if (gains == null) {
                 gains = new ArrayList<>();
                 this.records.put(this.previous, gains);
-                System.out.println();
-            } else
-                System.out.println(" (for the " + (gains.size() + 1) + "th time)");
+                //System.out.println();
+            } //else System.out.println(" (for the " + (gains.size() + 1) + "th time)");
             gains.add(diff);
 
             this.percent = newPercent;
@@ -56,6 +64,8 @@ public class Statistics {
     public void choiceReport(Description[] choices, int which) {
         this.previous = this.choice;
         this.choice = choices[which];
+
+        if (this.visual != null) this.visual.renderDescriptions(choices);
     }
 
     /**
@@ -63,7 +73,9 @@ public class Statistics {
      * @param status the status to report.
      */
     public void statusReport(Statistics.Status status) {
-        ; //System.out.println(status + " reported");
+        //System.out.println(status + " reported");
+
+        if (this.visual != null) this.visual.renderText(status.toString());
     }
 
     public enum Status {

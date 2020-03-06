@@ -3,7 +3,7 @@ package environnement.repository;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
+import java.util.ArrayList;
 
 import environnement.Description;
 import environnement.utils.TilePos;
@@ -14,15 +14,30 @@ import environnement.utils.TilePos;
  */
 public class FileRepository extends BaseRepository {
 
-    private Description[] data;
+    private ArrayList<Description> data;
+
+    public FileRepository() {
+        this.data = new ArrayList<>();
+    }
 
     public FileRepository(Path filePath) throws IOException {
-        List<String> raw = Files.readAllLines(filePath);
-        this.data = new Description[raw.size()];
-        for (int k = 0; k < this.data.length; k++) {
-            String[] tmp = raw.get(k).split("\\|");
-            this.data[k] = new Description(tmp[0], Integer.parseInt(tmp[1]), Integer.parseInt(tmp[2]), Float.parseFloat(tmp[3]), Integer.parseInt(tmp[4]), tmp[5]);
+        this();
+        this.load(filePath);
+    }
+
+    public void load(Path filePath) throws IOException {
+        for (String line : Files.readAllLines(filePath)) {
+            String[] raw = line.split("\\|");
+            Description d = new Description(raw[1], Integer.parseInt(raw[2]), Integer.parseInt(raw[3]), Float.parseFloat(raw[4]), Integer.parseInt(raw[5]), raw[6], raw[0]);
+            this.data.add(d);
         }
+    }
+
+    public void save(Path filePath) throws IOException {
+        String[] lines = FileRepository.getStringDump(this.data.toArray(new Description[this.data.size()]));
+        String save = String.join("\n", lines);
+
+        Files.write(filePath, save.getBytes());
     }
 
     /**
@@ -30,9 +45,9 @@ public class FileRepository extends BaseRepository {
      * @param d Description to dump.
      * @return the string dump.
      */
-    public static String getStringDump(Description d) {
+    protected static String getStringDump(Description d) {
         TilePos p = d.getPreferredLocation();
-        return d + "|" + p.x + "|" + p.y + "|" + d.getWeight() + "|" + d.getOccurences() + "|" + d.getAction();
+        return d.tag + "|" + d + "|" + p.x + "|" + p.y + "|" + d.getWeight() + "|" + d.getOccurences() + "|" + d.getAction();
     }
 
     /**
@@ -40,7 +55,7 @@ public class FileRepository extends BaseRepository {
      * @param ds Descriptions to dump.
      * @return the string dumps in an array.
      */
-    public static String[] getStringDump(Description...ds) {
+    protected static String[] getStringDump(Description...ds) {
         String[] r = new String[ds.length];
 
         for (int k = 0; k < r.length; k++)
@@ -51,9 +66,29 @@ public class FileRepository extends BaseRepository {
 
     @Override
     protected Description getNth(int n) {
-        if (-1 < n && n < this.data.length)
-            return this.data[n];
+        if (-1 < n && n < this.data.size())
+            return this.data.get(n);
         return null;
+    }
+
+    @Override
+    public Description getAny() {
+        return this.data.get((int) (Math.random() * this.data.size()));
+    }
+
+    @Override
+    public void add(Description d) {
+        this.data.add(d);
+    }
+
+    @Override
+    public void remove(Description d) {
+        this.data.remove(d);
+    }
+
+    @Override
+    public int count() {
+        return this.data.size();
     }
 
 }

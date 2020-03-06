@@ -46,13 +46,13 @@ public class UsageTest {
         String level = UsageTest.getLevel("tests/lvl-1.txt");
 
         // record the choices made to determine most interesting descriptions
-        Statistics rec = new Statistics();
+        Statistics rec = new Statistics(true);
         BaseAgent agent;
         try {
             // use the descriptions loaded in the FileRepository to make choices
             agent = new UseAgent(new FileRepository(Paths.get("./tests/generated.txt")), rec);
 
-            game.runGame(agent, level, 20, 0, true);
+            UsageTest.printResults(game.runGame(agent, level, 20, 0, true));
         } catch (IOException e) {
             e.printStackTrace();
         }

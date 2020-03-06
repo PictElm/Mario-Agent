@@ -43,19 +43,15 @@ public class GenerationTest {
         String level = GenerationTest.getLevel("tests/lvl-1.txt");
 
         // create a random agent and record its actions
-        Recorder rec = new Recorder();
+        FileRepository repo = new FileRepository();
+        Recorder rec = new Recorder(repo);
         BaseAgent agent = new ExperimentAgent(new RandomAction(30), rec);
 
-        game.runGame(agent, level, 20, 0, true);
+        game.runGame(agent, level, 20, 0, false);
 
         // save the recorded actions raw (as a FileRepository)
-        Description[] des = rec.getRecords();
-        System.out.println("Generated " + des.length + " description/action");
-
-        String save = String.join("\n", FileRepository.getStringDump(des));
-
         try {
-            Files.write(Paths.get("./tests/generated.txt"), save.getBytes());
+            repo.save(Paths.get("./tests/generated.txt"));
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -8,6 +8,8 @@ import environnement.utils.TilePos;
  */
 public class Description {
 
+    public final String tag;
+
     public final int width;
     public final int height;
     private final int grid[][];
@@ -19,7 +21,9 @@ public class Description {
 
     private final Action action;
 
-    public Description(int[][] grid, TilePos preferred, float weight, int occurences, Action action) {
+    public Description(int[][] grid, TilePos preferred, float weight, int occurences, Action action, String tag) {
+        this.tag = tag;
+
         this.width = grid.length;
         this.height = 0 < grid.length ? grid[0].length : 0;
         this.grid = grid;
@@ -42,9 +46,10 @@ public class Description {
      * @param occurences 
      * @param actionStr space-separated list of inputs.
      */
-    public Description(String gridStr, int prefX, int prefY, float weight, int occurences, String actionStr) {
-        this(Description.parseGrid(gridStr), new TilePos(prefX, prefY), weight, occurences, new Action(actionStr));
+    public Description(String gridStr, int prefX, int prefY, float weight, int occurences, String actionStr, String tag) {
+        this(Description.parseGrid(gridStr), new TilePos(prefX, prefY), weight, occurences, new Action(actionStr), tag);
     }
+
 
     /**
      * Returns the value of the description's grid.
@@ -94,6 +99,13 @@ public class Description {
      */
     public int getOccurences() {
         return this.occurences;
+    }
+
+    /**
+     * 
+     */
+    public void incOccurences() {
+        this.occurences++;
     }
 
     @Override

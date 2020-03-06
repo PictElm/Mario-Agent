@@ -68,7 +68,7 @@ public class RandomAction extends Random {
      * @param input previous frame's inputs.
      * @return a random (biased) list of boolean.
      */
-    protected boolean[] nextInputs(boolean[] input) {
+    public boolean[] nextInputs(boolean[] input) {
         boolean[] r = new boolean[input.length];
 
         for (int button = 0; button < input.length; button++)

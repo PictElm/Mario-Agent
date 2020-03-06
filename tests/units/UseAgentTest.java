@@ -2,7 +2,7 @@ package tests.units;
 
 import agents.UseAgent;
 import environnement.Description;
-import environnement.repository.StubRepository;
+//import environnement.repository.StubRepository;
 import environnement.utils.TilePos;
 
 public class UseAgentTest extends UseAgent {
@@ -10,7 +10,7 @@ public class UseAgentTest extends UseAgent {
     private int[][] testScene;
 
     public UseAgentTest() {
-        super(new StubRepository(), null);
+        super(null/*new StubRepository()*/, null);
 
         this.testScene = new int[][] {
             { 0, 0, 1, 1, 0 },

@@ -19,11 +19,13 @@ public class UseAgent extends BaseAgent {
     protected final BaseRepository prov;
     protected final Statistics stat;
 
-    private Action current;
-
     public UseAgent(BaseRepository descriptionProvider, Statistics statReport) {
         this.prov = descriptionProvider;
         this.stat = statReport;
+    }
+
+    public UseAgent(BaseRepository descriptionProvider) {
+        this(descriptionProvider, null);
     }
 
     /**
@@ -94,8 +96,8 @@ public class UseAgent extends BaseAgent {
             // if it's able to, complete the `to` list and re-evaluate weight with fit position
             if (0 < fittingPos.length) {
                 // find the best location for the description
-                int localBest = 0;
-                for (int k = 1; k < fittingPos.length; k++)
+                int localBest = (int) (Math.random() * fittingPos.length);
+                for (int k = 0; k < fittingPos.length; k++)
                     if (UseAgent.reWeight(next, fittingPos[localBest]) < UseAgent.reWeight(next, fittingPos[k]))
                         localBest = k;
 
@@ -121,9 +123,6 @@ public class UseAgent extends BaseAgent {
      * @param model access to game state.
      */
     protected void findNewAction(ForwardModel model) {
-        // make sure to properly free the previous action
-        if (this.current != null) this.current.reset();
-
         // query the 3 first fitting descriptions, result in `result`
         Description[] result = new Description[3];
         float[] weighted = new float[result.length];
@@ -133,17 +132,21 @@ public class UseAgent extends BaseAgent {
         if (wasAbleTo) {
             // find the most weighted one
             int max = 0;
-            for (int k = 0; k < weighted.length; k++)
-                if (weighted[max] < weighted[k])
-                    max = k;
+            for (int k = 0; k < result.length; k++) {
+                if (result[k] != null) {
+                    if (weighted[max] < weighted[k])
+                        max = k;
+                    result[k].incOccurences();
+                }
+            }
 
             // set it as the current action and report choice for statistics
-            this.current = result[max].getAction();
+            this.setCurrent(result[max].getAction());
             if (this.stat != null) this.stat.choiceReport(result, max);
 
         } else {
             // if no fitting description was found, do nothing
-            this.current = new Action("0"); // FIXME: will result in doing so endlessly
+            this.setCurrent(new Action("0")); // FIXME: will result in doing so endlessly
             if (this.stat != null) this.stat.statusReport(Statistics.Status.DEAD_END);
         }
     }
@@ -151,19 +154,19 @@ public class UseAgent extends BaseAgent {
     @Override
     public boolean[] feed(ForwardModel model) {
         // if no current action or previous action is finished, find a new one
-        if (this.current == null || this.current.finished())
+        if (!this.hasCurrent())
             this.findNewAction(model);
 
         // report progress for statistics
         if (this.stat != null) this.stat.progressReport(model);
 
         // consume the current action
-        return this.current.consume();
+        return this.getCurrent().consume();
     }
 
     @Override
     public String getAgentName() {
-        return super.getAgentName() + " [Use]";
+        return super.getAgentName() + " [Use:" + this.prov.count() + "]";
     }
 
 }

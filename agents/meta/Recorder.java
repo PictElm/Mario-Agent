@@ -1,18 +1,17 @@
 package agents.meta;
 
-import java.util.ArrayList;
-
 import environnement.Action;
 import environnement.Description;
 import environnement.ForwardModel;
+import environnement.repository.BaseRepository;
 import environnement.utils.TilePos;
 
 public class Recorder {
 
-    private ArrayList<Description> records;
+    private BaseRepository rec;
 
-    public Recorder() {
-        this.records = new ArrayList<>();
+    public Recorder(BaseRepository storage) {
+        this.rec = storage;
     }
 
     /**
@@ -21,12 +20,8 @@ public class Recorder {
      * @param model current environnement.
      */
     public void feedAction(Action action, ForwardModel model) {
-        Description d = new Description(model.getScreenSceneObservation(), new TilePos(), 0, 0, action);
-        this.records.add(d);
-    }
-
-    public Description[] getRecords() {
-        return this.records.toArray(new Description[this.records.size()]);
+        Description d = this.rec.newDescription(model.getScreenSceneObservation(), new TilePos(), action);
+        this.rec.add(d);
     }
 
 }
