@@ -72,11 +72,6 @@ public class FileRepository extends BaseRepository {
     }
 
     @Override
-    public Description getAny() {
-        return this.data.get((int) (Math.random() * this.data.size()));
-    }
-
-    @Override
     public void add(Description d) {
         this.data.add(d);
     }

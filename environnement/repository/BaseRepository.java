@@ -12,7 +12,6 @@ public abstract class BaseRepository {
      * @return the element or null.
      */
     protected abstract Description getNth(int n);
-    public abstract Description getAny();
 
     public abstract void add(Description d);
     public abstract void remove(Description d);

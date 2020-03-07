@@ -12,7 +12,7 @@ import environnement.repository.BaseRepository;
  */
 public class ExperimentAgent extends BaseAgent {
 
-    private final RandomAction action;
+    private final RandomAction random;
     private final Recorder rec;
 
     private final TaskType task;
@@ -22,7 +22,7 @@ public class ExperimentAgent extends BaseAgent {
         this.rec = actionRecorder;
         this.task = TaskType.GENERATE;
 
-        this.action = randomAction;
+        this.random = randomAction;
         this.prov = null;
     }
 
@@ -30,7 +30,7 @@ public class ExperimentAgent extends BaseAgent {
         this.rec = actionRecorder;
         this.task = task;
 
-        this.action = randomAction;
+        this.random = randomAction;
         this.prov = descriptionProvider;
     }
 
@@ -42,29 +42,32 @@ public class ExperimentAgent extends BaseAgent {
 
     private Action alterAction(Description d) {
         Action action = d.getAction();
+        action.reset();
 
-        int before = (int) (Math.random() * 5);
-        int after = (int) (Math.random() * 5);
+        int range = Math.min((int) (action.length / 2), 10);
 
-        int start = 0 + (int) (Math.random() * 5);
-        int end = action.length - 1 - (int) (Math.random() * 5);
+        int before = this.random.nextInt(range);
+        int after = this.random.nextInt(range);
+
+        int start = 0 + this.random.nextInt(range);
+        int end = action.length - 1 - this.random.nextInt(range);
 
         boolean[][] inputs = new boolean[before + (end - start + 1) + after][];
 
-        // same from `start` to `end` (offset by `before`)
-        for (int k = 0; k < end; k++) {
+        // copy from `start` to `end` (offset by `before`)
+        for (int k = 0; k < end + 1; k++) {
             boolean[] frame = action.consume();
             if (start - 1 < k)
-                inputs[before + k] = frame;
+                inputs[before - start + k] = frame;
         }
 
-        // ends with `after` new inputs
-        for (int k = before + (end - start + 1); k < before + (end - start + 1) + after; k--)
-            inputs[k] = this.action.nextInputs(inputs[k - 1]);
+        // end with `after` new random inputs
+        for (int k = 0; k < after; k++)
+            inputs[before - start + end + k + 1] = this.random.nextInputs(inputs[before - start + end + k]);
 
-        // starts with `before` new inputs
+        // start with `before` new random inputs
         for (int k = before; 0 < k; k--)
-            inputs[k - 1] = this.action.nextInputs(inputs[k]);
+            inputs[k - 1] = this.random.nextInputs(inputs[k]);
 
         return new Action(inputs);
     }
@@ -74,9 +77,9 @@ public class ExperimentAgent extends BaseAgent {
         // if no current action or previous action is finished, ask for a new random one
         if (!this.hasCurrent()) {
             if (this.task == TaskType.GENERATE)
-                this.setCurrent(this.action.nextAction());
+                this.setCurrent(this.random.nextAction());
             else if (this.task == TaskType.X_ACTION)
-                this.setCurrent(this.alterAction(this.prov.getAny()));
+                this.setCurrent(this.alterAction(this.prov.getFirst(1)[0]));
 
             // record inputs
             if (this.rec != null) this.rec.feedAction(this.getCurrent(), model);

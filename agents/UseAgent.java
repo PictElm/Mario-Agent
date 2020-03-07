@@ -96,8 +96,8 @@ public class UseAgent extends BaseAgent {
             // if it's able to, complete the `to` list and re-evaluate weight with fit position
             if (0 < fittingPos.length) {
                 // find the best location for the description
-                int localBest = (int) (Math.random() * fittingPos.length);
-                for (int k = 0; k < fittingPos.length; k++)
+                int localBest = 0;
+                for (int k = 1; k < fittingPos.length; k++)
                     if (UseAgent.reWeight(next, fittingPos[localBest]) < UseAgent.reWeight(next, fittingPos[k]))
                         localBest = k;
 

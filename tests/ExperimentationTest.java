@@ -21,17 +21,22 @@ import environnement.Description;
 import environnement.RandomAction;
 import environnement.repository.BaseRepository;
 import environnement.repository.FileRepository;
+import environnement.repository.OneRepository;
 
 public class ExperimentationTest {
 
-    public static MarioResult run(MarioAgent agent) {
+    public static MarioResult run(MarioAgent agent, boolean visual) {
         try {
             String level = new String(Files.readAllBytes(Paths.get("tests/lvl-1.txt")));
-            return new MarioGame().runGame(agent, level, 20, 0, true);
+            return new MarioGame().runGame(agent, level, 20, 0, visual);
         } catch (IOException e) {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public static MarioResult run(MarioAgent agent) {
+        return ExperimentationTest.run(agent, true);
     }
 
     public static void main(String[] args) {
@@ -51,9 +56,9 @@ public class ExperimentationTest {
             if (Collections.max(pair.getValue()) <= 0)
                 repo.remove(pair.getKey());
 
-        // create another agent to experiment on those descriptions
-        BaseAgent agentExperiment = new ExperimentAgent(new RandomAction(5), repo, new Recorder(repo), TaskType.X_ACTION);
-        ExperimentationTest.run(agentExperiment);
+        // create another agent to experiment on the 'best' description
+        BaseAgent agentExperiment = new ExperimentAgent(new RandomAction(5), new OneRepository(useSta.getBest().getKey()), new Recorder(repo), TaskType.X_ACTION);
+        ExperimentationTest.run(agentExperiment, true);
     }
 
 }
