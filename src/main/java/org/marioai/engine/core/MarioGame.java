@@ -8,6 +8,7 @@ import java.awt.event.KeyAdapter;
 import javax.swing.JFrame;
 
 import org.marioai.engine.HumanAgent;
+import org.marioai.engine.core.MarioRender.AddedRender;
 import org.marioai.engine.helper.GameStatus;
 import org.marioai.engine.helper.MarioActions;
 
@@ -57,11 +58,22 @@ public class MarioGame {
     private MarioAgent agent = null;
     private MarioWorld world = null;
 
+    private AddedRender[] debug = new AddedRender[0];
+
+    private boolean overrideStartPos = false;
+    private float startPercent = 0f;
+
     /**
      * Create a mario game to be played
      */
-    public MarioGame() {
+    public MarioGame(AddedRender... debug) {
+        this.debug = debug;
+    }
 
+    public MarioGame(float completionPercentage, AddedRender... debug) {
+        this(debug);
+        this.overrideStartPos = true;
+        this.startPercent = completionPercentage;
     }
 
     /**
@@ -206,7 +218,7 @@ public class MarioGame {
     public MarioResult runGame(MarioAgent agent, String level, int timer, int marioState, boolean visuals, int fps, float scale) {
         if (visuals) {
             this.window = new JFrame("Mario AI Framework");
-            this.render = new MarioRender(scale);
+            this.render = new MarioRender(scale, this.debug);
             this.window.setContentPane(this.render);
             this.window.pack();
             this.window.setResizable(false);
@@ -215,7 +227,10 @@ public class MarioGame {
             this.window.setVisible(true);
         }
         this.setAgent(agent);
-        return this.gameLoop(level, timer, marioState, visuals, fps);
+        MarioResult r = this.gameLoop(level, timer, marioState, visuals, fps);
+        if (visuals)
+            this.window.dispose();
+        return r;
     }
 
     private MarioResult gameLoop(String level, int timer, int marioState, boolean visual, int fps) {
@@ -224,6 +239,11 @@ public class MarioGame {
         this.world.initializeLevel(level, 1000 * timer);
         if (visual) {
             this.world.initializeVisuals(this.render.getGraphicsConfiguration());
+        }
+        if (this.overrideStartPos) {
+            this.world.mario.x = this.startPercent * (this.world.level.exitTileX * 16);
+            //this.world.mario.y = 5;
+            //while (this.world.level.getBlock((int) this.world.mario.x, (int) --this.world.mario.y) != 0);
         }
         this.world.mario.isLarge = marioState > 0;
         this.world.mario.isFire = marioState > 1;

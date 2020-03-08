@@ -8,6 +8,7 @@ import org.marioai.engine.helper.MarioActions;
 import java.awt.*;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.util.ArrayList;
 
 
 public class MarioRender extends JComponent implements FocusListener {
@@ -21,7 +22,9 @@ public class MarioRender extends JComponent implements FocusListener {
     Thread animator;
     boolean focused;
 
-    public MarioRender(float scale) {
+    ArrayList<AddedRender> debug;
+
+    public MarioRender(float scale, AddedRender... debug) {
         this.setFocusable(true);
         this.setEnabled(true);
         this.scale = scale;
@@ -33,6 +36,10 @@ public class MarioRender extends JComponent implements FocusListener {
         setMaximumSize(size);
 
         setFocusable(true);
+
+        this.debug = new ArrayList<>();
+        for (AddedRender it : debug)
+            this.debug.add(it);
     }
 
     public void init() {
@@ -46,6 +53,10 @@ public class MarioRender extends JComponent implements FocusListener {
         drawStringDropShadow(og, "Lives: " + world.lives, 0, 0, 7);
         drawStringDropShadow(og, "Coins: " + world.coins, 11, 0, 7);
         drawStringDropShadow(og, "Time: " + (world.currentTimer == -1 ? "Inf" : (int) Math.ceil(world.currentTimer / 1000f)), 22, 0, 7);
+
+        for (AddedRender it : this.debug)
+            it.render(og, this);
+
         if (MarioGame.verbose) {
             String pressedButtons = "";
             for (int i = 0; i < world.mario.actions.length; i++) {
@@ -80,5 +91,9 @@ public class MarioRender extends JComponent implements FocusListener {
 
     public void focusLost(FocusEvent arg0) {
         focused = false;
+    }
+
+    public interface AddedRender {
+        public void render(Graphics g, MarioRender r);
     }
 }

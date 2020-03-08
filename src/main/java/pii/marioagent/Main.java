@@ -1,5 +1,6 @@
 package pii.marioagent;
 
+import java.awt.Graphics;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -15,6 +16,8 @@ import org.graphstream.graph.implementations.SingleGraph;
 import org.marioai.engine.core.MarioAgent;
 import org.marioai.engine.core.MarioGame;
 import org.marioai.engine.core.MarioResult;
+import org.marioai.engine.core.MarioRender;
+import org.marioai.engine.core.MarioRender.AddedRender;
 
 import pii.marioagent.agents.ExperimentAgent;
 import pii.marioagent.agents.ExperimentAgent.TaskType;
@@ -30,18 +33,14 @@ public class Main {
 
     public static final boolean quiet = true;
 
-    public static MarioResult run(MarioAgent agent, boolean visual) {
+    public static MarioResult run(MarioAgent agent, AddedRender... visual) {
         try {
             String level = new String(Files.readAllBytes(Paths.get("./src/main/res/levels/test.txt")));
-            return new MarioGame().runGame(agent, level, 5, 0, visual);
+            return new MarioGame(visual).runGame(agent, level, 20, 0, 0 < visual.length);
         } catch (IOException e) {
             e.printStackTrace();
         }
         return null;
-    }
-
-    public static MarioResult run(MarioAgent agent) {
-        return Main.run(agent, false);
     }
 
     public static void addNode(Graph graph, Description d) {
@@ -79,7 +78,7 @@ public class Main {
 
             // create a new agent to use and evaluate the descriptions
             Statistics usage = new Statistics();
-            Main.run(new UseAgent(repo, usage), false);
+            Main.run(new UseAgent(repo, usage));
             List<Entry<Description, ArrayList<Float>>> bests = usage.getBests();
 
             for (Description it : repo.getFirst(repo.count())) {
@@ -102,16 +101,19 @@ public class Main {
             int c = 0;
             for (Entry<Description, ArrayList<Float>> pair : bests) {
                 Description it = pair.getKey();
+                float min = Collections.min(pair.getValue());
+                float max = Collections.max(pair.getValue());
 
-                it.setWeight(it.getWeight() + 10f / ++c);
+                //it.setWeight(it.getWeight() + 10f / ++c);
                 //it.setWeight(it.getWeight() - ++c);
                 //it.setWeight(it.getWeight() + 1f / (it.getOccurences() + 1));
+                it.setWeight(it.getWeight() + min);
 
-                if (!Main.quiet) System.out.print(it.tag + ": from " + Collections.min(pair.getValue()) + " to " + Collections.max(pair.getValue()));
+                if (!Main.quiet) System.out.print(it.tag + ": from " + min + " to " + max);
                 if (!Main.quiet) System.out.println(" (" + it.getWeight() + " x " + it.getOccurences() + ")");
 
                 // if it helped
-                if (0 < Collections.max(pair.getValue())) {
+                if (0 < max) {
                     save.add(it);
                     // keep it for next turn
                     repo.add(it);
@@ -127,7 +129,8 @@ public class Main {
 
         //save.save(Paths.get("./save.txt"));
         System.out.println("Repository size: " + save.count() + ".");
-        Main.run(new UseAgent(save), true);
+        Statistics visu = new Statistics();
+        Main.run(new UseAgent(save, visu), visu);
     }
 
 }
