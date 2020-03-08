@@ -76,7 +76,7 @@ public class ExperimentAgent extends BaseAgent {
     }
 
     @Override
-    public boolean[] feed(ForwardModel model) {
+    protected boolean[] feed(ForwardModel model) {
         // if no current action or previous action is finished, ask for a new random one
         if (!this.hasCurrent()) {
             Description base = null;
@@ -98,6 +98,13 @@ public class ExperimentAgent extends BaseAgent {
 
         // consume the current action
         return this.getCurrent().consume();
+    }
+
+    @Override
+    protected AgentSettings getSettings() {
+        if (this.task == TaskType.GENERATE)
+            return new AgentSettings(20);
+        return new AgentSettings(5, this.random.nextFloat());
     }
 
     @Override

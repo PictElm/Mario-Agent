@@ -1,9 +1,6 @@
 package pii.marioagent;
 
-import java.awt.Graphics;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -13,11 +10,6 @@ import org.graphstream.graph.ElementNotFoundException;
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.IdAlreadyInUseException;
 import org.graphstream.graph.implementations.SingleGraph;
-import org.marioai.engine.core.MarioAgent;
-import org.marioai.engine.core.MarioGame;
-import org.marioai.engine.core.MarioResult;
-import org.marioai.engine.core.MarioRender;
-import org.marioai.engine.core.MarioRender.AddedRender;
 
 import pii.marioagent.agents.ExperimentAgent;
 import pii.marioagent.agents.ExperimentAgent.TaskType;
@@ -31,17 +23,8 @@ import pii.marioagent.environnement.repository.OneRepository;
 
 public class Main {
 
-    public static final boolean quiet = true;
-
-    public static MarioResult run(MarioAgent agent, AddedRender... visual) {
-        try {
-            String level = new String(Files.readAllBytes(Paths.get("./src/main/res/levels/test.txt")));
-            return new MarioGame(visual).runGame(agent, level, 20, 0, 0 < visual.length);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
+    public static final String TEST_LEVEL = "./src/main/res/levels/test.txt";
+    public static final boolean QUIET = true;
 
     public static void addNode(Graph graph, Description d) {
         Description p = d.getFrom();
@@ -68,17 +51,17 @@ public class Main {
         Graph graph = new SingleGraph("g1");
         graph.display(true);
 
-        for (int k = 0; k < 100; k++) {
+        for (int k = 0; k < 10; k++) {
             System.out.println("Iteration " + k + ".");
 
             // create a first agent to generate some descriptions
-            Main.run(new ExperimentAgent(new RandomAction(30), new Recorder(repo)));
+            new ExperimentAgent(new RandomAction(30), new Recorder(repo)).run(Main.TEST_LEVEL);
 
-            if (!Main.quiet) System.out.println(repo.count() + " entries to work with.");
+            if (!Main.QUIET) System.out.println(repo.count() + " entries to work with.");
 
             // create a new agent to use and evaluate the descriptions
             Statistics usage = new Statistics();
-            Main.run(new UseAgent(repo, usage));
+            new UseAgent(repo, usage).run(Main.TEST_LEVEL);
             List<Entry<Description, ArrayList<Float>>> bests = usage.getBests();
 
             for (Description it : repo.getFirst(repo.count())) {
@@ -109,8 +92,8 @@ public class Main {
                 //it.setWeight(it.getWeight() + 1f / (it.getOccurences() + 1));
                 it.setWeight(it.getWeight() + min);
 
-                if (!Main.quiet) System.out.print(it.tag + ": from " + min + " to " + max);
-                if (!Main.quiet) System.out.println(" (" + it.getWeight() + " x " + it.getOccurences() + ")");
+                if (!Main.QUIET) System.out.print(it.tag + ": from " + min + " to " + max);
+                if (!Main.QUIET) System.out.println(" (" + it.getWeight() + " x " + it.getOccurences() + ")");
 
                 // if it helped
                 if (0 < max) {
@@ -118,19 +101,19 @@ public class Main {
                     // keep it for next turn
                     repo.add(it);
                     // experiment on it
-                    Main.run(new ExperimentAgent(new RandomAction(5), new OneRepository(it), new Recorder(repo), TaskType.X_ACTION));
+                    new ExperimentAgent(new RandomAction(5), new OneRepository(it), new Recorder(repo), TaskType.X_ACTION).run(TEST_LEVEL);
                 }
             }
 
             //save.save(Paths.get("./run/it" + k + ".txt"));
 
-            if (!Main.quiet) System.out.println("\n");
+            if (!Main.QUIET) System.out.println("\n");
         }
 
         //save.save(Paths.get("./save.txt"));
         System.out.println("Repository size: " + save.count() + ".");
-        Statistics visu = new Statistics();
-        Main.run(new UseAgent(save, visu), visu);
+        Statistics visual = new Statistics();
+        new UseAgent(save, visual).run(Main.TEST_LEVEL, visual);
     }
 
 }

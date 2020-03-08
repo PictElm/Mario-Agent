@@ -152,7 +152,7 @@ public class UseAgent extends BaseAgent {
     }
 
     @Override
-    public boolean[] feed(ForwardModel model) {
+    protected boolean[] feed(ForwardModel model) {
         // if no current action or previous action is finished, find a new one
         if (!this.hasCurrent())
             this.findNewAction(model);
@@ -162,6 +162,11 @@ public class UseAgent extends BaseAgent {
 
         // consume the current action
         return this.getCurrent().consume();
+    }
+
+    @Override
+    protected AgentSettings getSettings() {
+        return new AgentSettings(20);
     }
 
     @Override
