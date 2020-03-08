@@ -51,14 +51,16 @@ public abstract class BaseRepository {
 
     private static int descriptionTagCounter = -1;
     protected static String newDescriptionTag() {
-        char c = 26 * 26 < ++BaseRepository.descriptionTagCounter ? 'a' : 'A';
-        return "" + (char) (c + (int) (BaseRepository.descriptionTagCounter / 26)) + (char) (c + (int) (BaseRepository.descriptionTagCounter % 26));
+        //char c = 26 * 26 < ++BaseRepository.descriptionTagCounter ? 'a' : 'A';
+        //return "" + (char) (c + (int) (BaseRepository.descriptionTagCounter / 26)) + (char) (c + (int) (BaseRepository.descriptionTagCounter % 26));
+        return Integer.toHexString(++BaseRepository.descriptionTagCounter);
     }
 
     private static int actionTagCounter = -1;
     protected static String newActionTag() {
-        char c = 26 * 26 < ++BaseRepository.actionTagCounter ? 'a' : 'A';
-        return "" + (char) (c + (int) (BaseRepository.actionTagCounter / 26)) + (char) (c + (int) (BaseRepository.actionTagCounter % 26));
+        //char c = 26 * 26 < ++BaseRepository.actionTagCounter ? 'a' : 'A';
+        //return "" + (char) (c + (int) (BaseRepository.actionTagCounter / 26)) + (char) (c + (int) (BaseRepository.actionTagCounter % 26));
+        return Integer.toHexString(++BaseRepository.actionTagCounter);
     }
 
 }
