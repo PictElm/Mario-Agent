@@ -35,10 +35,10 @@ public class FileRepositoryTest {
         Description d = FileRepository.getDecriptionLoad(save);
 
         Assert.assertArrayEquals(new int[][] { { 1, 0 }, { 0, -1 } }, d.getGrid());
-        Assert.assertEquals(new TilePos(4, 2),                        d.getPreferredLocation());
-        Assert.assertEquals(12.34f,                                   d.getWeight(), .001);
-        Assert.assertEquals(7,                                        d.getOccurences());
-        Assert.assertEquals(action,                                   d.getAction());
-        Assert.assertEquals("tag",                                    d.tag);
+        Assert.assertEquals(new TilePos(4, 2), d.getPreferredLocation());
+        Assert.assertEquals(12.34f, d.getWeight(), .001);
+        Assert.assertEquals(7, d.getOccurences());
+        Assert.assertEquals(action, d.getAction());
+        Assert.assertEquals("tag", d.tag);
     }
 }

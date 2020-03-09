@@ -23,7 +23,7 @@ import pii.marioagent.environnement.repository.OneRepository;
 
 public class Main {
 
-    public static final String TEST_LEVEL = "./src/main/res/levels/test.txt";
+    public static final String TEST_LEVEL = "./src/main/resources/levels/test.txt";
     public static final boolean QUIET = true;
 
     public static void addNode(Graph graph, Description d) {
