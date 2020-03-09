@@ -28,6 +28,10 @@ public class Action {
         this(Action.parseInput(actionStr));
     }
 
+    public Action() {
+        this(new boolean[0][5]);
+    }
+
     /**
      * Returns the current inputs and advance by one for next call.
      * @return inputs (0: Left, Right, Down, Speed, Jump).
@@ -65,6 +69,24 @@ public class Action {
         return r.toString();
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof Action) {
+            Action p = (Action) o;
+            if (p.length != this.length)
+                return false;
+            for (int i = 0; i < this.length; i++) {
+                if (p.inputs[i].length != this.inputs[i].length)
+                    return false;
+                for (int j = 0; j < this.inputs[i].length; j++)
+                    if (p.inputs[i][j] != this.inputs[i][j])
+                        return false;
+            }
+            return true;
+        }
+        return false;
+    }
+
     /**
      * Used to create a new Action with inputs from a string of space-separated bit-fields list.
      * @param c space-separated list of inputs.
@@ -74,12 +96,14 @@ public class Action {
 
         if (c.equals("")) return new boolean[0][5];
 
+        int nbInputs = MarioActions.numberOfActions();
+
         String[] raw = c.split(" ");
-        r = new boolean[raw.length][MarioActions.numberOfActions()];
+        r = new boolean[raw.length][nbInputs];
 
         for (int frame = 0; frame < raw.length; frame++) {
             int pressed = Integer.parseInt(raw[frame]);
-            for (int button = 0; button < 4; button++)
+            for (int button = 0; button < nbInputs; button++)
                 r[frame][button] = ((1 << button) & pressed) != 0;
         }
 

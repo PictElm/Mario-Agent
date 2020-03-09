@@ -125,7 +125,7 @@ public class Statistics implements AddedRender {
     @Override
     public void render(Graphics g, MarioRender r) {
         Description d = this.choice;
-        r.drawStringDropShadow(g, "Description's tag: " + d.tag, 0, 1, 7);
+        r.drawStringDropShadow(g, "Description tag: " + d.tag, 0, 1, 7);
         for (int i = 0; i < d.width; i++)
             for (int j = 0; j < d.height; j++)
                 if (d.getAt(i, j) != 0)

@@ -22,6 +22,15 @@ public class TilePos {
         return "TilePos(" + this.x + ", " + this.y + ")";
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof TilePos) {
+            TilePos p = (TilePos) o;
+            return p.x == this.x && p.y == this.y;
+        }
+        return false;
+    }
+
     /**
      * Returns the square of the euclidean distance of 2 tiles.
      * @param a tile 1.
@@ -44,4 +53,5 @@ public class TilePos {
     public static float distance(TilePos a, TilePos b) {
         return (float) Math.sqrt(TilePos.distanceSq(a, b));
     }
+
 }

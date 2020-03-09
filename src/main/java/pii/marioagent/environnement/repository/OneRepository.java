@@ -16,12 +16,12 @@ public class OneRepository extends BaseRepository {
     }
 
     @Override
-    public void add(Description d) {
-        this.d = d;
+    public void add(Description... des) {
+        ;
     }
 
     @Override
-    public void remove(Description d) {
+    public void remove(Description... d) {
         ;
     }
 

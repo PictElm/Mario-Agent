@@ -14,8 +14,8 @@ public abstract class BaseRepository {
      */
     protected abstract Description getNth(int n);
 
-    public abstract void add(Description d);
-    public abstract void remove(Description d);
+    public abstract void add(Description... des);
+    public abstract void remove(Description... des);
 
     public abstract int count();
 
@@ -50,14 +50,14 @@ public abstract class BaseRepository {
     }
 
     private static int descriptionTagCounter = -1;
-    protected static String newDescriptionTag() {
+    protected static final String newDescriptionTag() {
         //char c = 26 * 26 < ++BaseRepository.descriptionTagCounter ? 'a' : 'A';
         //return "" + (char) (c + (int) (BaseRepository.descriptionTagCounter / 26)) + (char) (c + (int) (BaseRepository.descriptionTagCounter % 26));
         return Integer.toHexString(++BaseRepository.descriptionTagCounter);
     }
 
     private static int actionTagCounter = -1;
-    protected static String newActionTag() {
+    protected static final String newActionTag() {
         //char c = 26 * 26 < ++BaseRepository.actionTagCounter ? 'a' : 'A';
         //return "" + (char) (c + (int) (BaseRepository.actionTagCounter / 26)) + (char) (c + (int) (BaseRepository.actionTagCounter % 26));
         return Integer.toHexString(++BaseRepository.actionTagCounter);

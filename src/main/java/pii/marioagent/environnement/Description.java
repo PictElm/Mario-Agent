@@ -43,6 +43,10 @@ public class Description {
         this.from = from;
     }
 
+    public Description(int[][] grid, TilePos preferred, float weight, String tag) {
+        this(grid, preferred, weight, 0, new Action(), tag, TaskType.GENERATE, null);
+    }
+
     /**
      * Create a new Description with grid from a string of semicolon- and comma-separated ints table.
      * @see Action(String)
