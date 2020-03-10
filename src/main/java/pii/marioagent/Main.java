@@ -1,5 +1,6 @@
 package pii.marioagent;
 
+import java.awt.Graphics;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -10,11 +11,12 @@ import org.graphstream.graph.ElementNotFoundException;
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.IdAlreadyInUseException;
 import org.graphstream.graph.implementations.SingleGraph;
+import org.marioai.engine.core.MarioRender;
 
-import pii.marioagent.agents.ExperimentAgent;
-import pii.marioagent.agents.ExperimentAgent.TaskType;
-import pii.marioagent.agents.UseAgent;
 import pii.marioagent.agents.BaseAgent.AgentSettings;
+import pii.marioagent.agents.ExperimentAgent.TaskType;
+import pii.marioagent.agents.ExperimentAgent;
+import pii.marioagent.agents.UseAgent;
 import pii.marioagent.agents.meta.Recorder;
 import pii.marioagent.agents.meta.Statistics;
 import pii.marioagent.environnement.Description;
@@ -32,10 +34,10 @@ public class Main {
         try {
             graph.addNode(d.tag).setAttribute("label", d.tag);
             if (p != null)
-                graph.addEdge(p.tag + "-" + d.tag, p.tag, d.tag).setAttribute("layout.weight", 2);
+                graph.addEdge(p.tag + "-" + d.tag, p.tag, d.tag, true).setAttribute("layout.weight", 2);
         } catch (ElementNotFoundException e) {
             Main.addNode(graph, p);
-            graph.addEdge(p.tag + "-" + d.tag, p.tag, d.tag).setAttribute("layout.weight", 2);
+            graph.addEdge(p.tag + "-" + d.tag, p.tag, d.tag, true).setAttribute("layout.weight", 2);
         } catch (IdAlreadyInUseException e) {}
     }
 
@@ -52,7 +54,7 @@ public class Main {
         Graph graph = new SingleGraph("g1");
         graph.display(true);
 
-        for (int k = 0; k < 50; k++) {
+        for (int k = 0; k < 100; k++) {
             System.out.println("Iteration " + k + ".");
 
             // create a first agent to generate some descriptions
@@ -68,7 +70,7 @@ public class Main {
             for (Description it : repo.getFirst(repo.count())) {
                 boolean found = false;
                 for (Entry<Description, ArrayList<Float>> pair : bests)
-                    if (pair.getKey() == it) {
+                    if (pair.getKey().tag == it.tag) {
                         found = true;
                         break;
                     }
@@ -115,7 +117,11 @@ public class Main {
 
         //save.save(Paths.get("./save.txt"));
         System.out.println("Repository size: " + save.count() + ".");
-        Statistics visual = new Statistics();
+
+        Graph newGraph = new SingleGraph("g2");
+        newGraph.display(true);
+
+        Statistics visual = new Statistics(newGraph);
         new UseAgent(save, visual).run(Main.TEST_LEVEL, new AgentSettings(200), visual);
     }
 

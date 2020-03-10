@@ -1,5 +1,6 @@
 package pii.marioagent.agents.meta;
 
+import java.awt.Color;
 import java.awt.Graphics;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -8,6 +9,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.graphstream.graph.Graph;
+import org.graphstream.graph.Node;
 import org.marioai.engine.core.MarioRender;
 import org.marioai.engine.core.MarioRender.AddedRender;
 
@@ -26,8 +29,29 @@ public class Statistics implements AddedRender {
 
     private HashMap<Description, ArrayList<Float>> records;
 
+    private Graph graph;
+
     public Statistics() {
         this.records = new HashMap<>();
+    }
+
+    public Statistics(Graph graph) {
+        this();
+        this.graph = graph;
+        this.graph.addAttribute("ui.stylesheet", "node { fill-mode: dyn-plain; size: 15px; }");
+    }
+
+    private Node getOrAddNode(Description d) {
+        Node r = this.graph.getNode(d.tag);
+        if (r == null) {
+            r = this.graph.addNode(d.tag);
+            r.setAttribute("label", d.tag);
+
+            Description p = d.getFrom();
+            if (p != null)
+                this.graph.addEdge(p.tag + "-" + d.tag, this.getOrAddNode(p), r, true);
+        }
+        return r;
     }
 
     /**
@@ -64,9 +88,18 @@ public class Statistics implements AddedRender {
      * @param which   the description the agent found most fitting.
      */
     public void choiceReport(Description[] found, TilePos[] at, int choice) {
+        if (this.graph != null)
+            if (this.choice != null) this.getOrAddNode(this.choice).setAttribute("ui.color", Color.RED); // red: used
+
         this.previous = this.choice;
         this.choice = found[choice];
         this.choiceAt = at[choice];
+
+        if (this.graph != null) {
+            for (Description it : found)
+                if (it != null) this.getOrAddNode(it).setAttribute("ui.color", Color.BLUE); // blue: seen
+            if (this.choice != null) this.getOrAddNode(this.choice).setAttribute("ui.color", Color.GREEN); // green: using
+        }
     }
 
     /**
@@ -76,8 +109,11 @@ public class Statistics implements AddedRender {
      */
     public void statusReport(Statistics.Status status) {
         // System.out.println(status + " reported");
-        if (status == Status.DEAD_END)
+        if (status == Status.DEAD_END) {
+            if (this.graph != null)
+                if (this.choice != null) this.getOrAddNode(this.choice).setAttribute("ui.color", Color.RED);
             this.choice = null;
+        }
     }
 
     public enum Status {
