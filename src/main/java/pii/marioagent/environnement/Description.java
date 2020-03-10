@@ -128,7 +128,15 @@ public class Description {
      * @return
      */
     public Description getFrom() {
-        return from;
+        return this.from;
+    }
+
+    /**
+     * 
+     * @return
+     */
+    public TaskType getHow() {
+        return this.how;
     }
 
     @Override

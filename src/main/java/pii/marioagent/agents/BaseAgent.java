@@ -31,17 +31,20 @@ public abstract class BaseAgent implements MarioAgent {
         return this.currentAction != null && !this.currentAction.finished();
     }
 
-    public MarioResult run(String levelFile, AddedRender... visual) {
+    public MarioResult run(String levelFile, AgentSettings settings, AddedRender... visual) {
         try {
             String level = new String(Files.readAllBytes(Paths.get(levelFile)));
-            
-            AgentSettings s = this.getSettings();
-            MarioGame game = s.overrideStart ? new MarioGame(s.startPercent, visual) : new MarioGame(visual);
-            return game.runGame(this, level, s.timer, s.marioState, 0 < visual.length);
+
+            MarioGame game = settings.overrideStart ? new MarioGame(settings.startPercent, visual) : new MarioGame(visual);
+            return game.runGame(this, level, settings.timer, settings.marioState, 0 < visual.length);
         } catch (IOException e) {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public MarioResult run(String levelFile, AddedRender... visual) {
+        return this.run(levelFile, this.getSettings(), visual);
     }
 
     /**
@@ -68,7 +71,7 @@ public abstract class BaseAgent implements MarioAgent {
         return "D/A";
     }
 
-    protected class AgentSettings {
+    public static class AgentSettings {
 
         public final int timer;
         public final int marioState;

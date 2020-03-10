@@ -14,6 +14,7 @@ import org.graphstream.graph.implementations.SingleGraph;
 import pii.marioagent.agents.ExperimentAgent;
 import pii.marioagent.agents.ExperimentAgent.TaskType;
 import pii.marioagent.agents.UseAgent;
+import pii.marioagent.agents.BaseAgent.AgentSettings;
 import pii.marioagent.agents.meta.Recorder;
 import pii.marioagent.agents.meta.Statistics;
 import pii.marioagent.environnement.Description;
@@ -51,7 +52,7 @@ public class Main {
         Graph graph = new SingleGraph("g1");
         graph.display(true);
 
-        for (int k = 0; k < 10; k++) {
+        for (int k = 0; k < 50; k++) {
             System.out.println("Iteration " + k + ".");
 
             // create a first agent to generate some descriptions
@@ -87,16 +88,16 @@ public class Main {
                 float min = Collections.min(pair.getValue());
                 float max = Collections.max(pair.getValue());
 
-                //it.setWeight(it.getWeight() + 10f / ++c);
+                it.setWeight(it.getWeight() + 10f / ++c);
                 //it.setWeight(it.getWeight() - ++c);
                 //it.setWeight(it.getWeight() + 1f / (it.getOccurences() + 1));
-                it.setWeight(it.getWeight() + min);
+                //it.setWeight(it.getWeight() + min);
 
                 if (!Main.QUIET) System.out.print(it.tag + ": from " + min + " to " + max);
                 if (!Main.QUIET) System.out.println(" (" + it.getWeight() + " x " + it.getOccurences() + ")");
 
                 // if it helped
-                if (0 < max) {
+                if (0 < min) {
                     save.add(it);
                     // keep it for next turn
                     repo.add(it);
@@ -115,7 +116,7 @@ public class Main {
         //save.save(Paths.get("./save.txt"));
         System.out.println("Repository size: " + save.count() + ".");
         Statistics visual = new Statistics();
-        new UseAgent(save, visual).run(Main.TEST_LEVEL, visual);
+        new UseAgent(save, visual).run(Main.TEST_LEVEL, new AgentSettings(200), visual);
     }
 
 }

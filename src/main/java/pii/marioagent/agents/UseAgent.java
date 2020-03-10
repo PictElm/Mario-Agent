@@ -142,7 +142,7 @@ public class UseAgent extends BaseAgent {
 
             // set it as the current action and report choice for statistics
             this.setCurrent(result[max].getAction());
-            if (this.stat != null) this.stat.choiceReport(result, max);
+            if (this.stat != null) this.stat.choiceReport(result, foundAt, max);
 
         } else {
             // if no fitting description was found, do nothing

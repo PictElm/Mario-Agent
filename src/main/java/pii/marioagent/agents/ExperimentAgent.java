@@ -76,8 +76,8 @@ public class ExperimentAgent extends BaseAgent {
     }
 
     public Description alterDescription(Description d) {
-        int range = 2;
-        //int range = Math.min(Math.min((int) (d.width / 2), (int) (d.height / 2)), 2);
+        //int range = 2;
+        int range = Math.min(Math.min((int) (d.width / 2), (int) (d.height / 2)), 2);
 
         int startI = this.random.nextInt(range);
         int endI = d.width - 1 - this.random.nextInt(range);
@@ -90,7 +90,7 @@ public class ExperimentAgent extends BaseAgent {
         for (int i = startI; i < endI; i++) {
             for (int j = startJ; j < endJ; j++) {
                 int at = d.getAt(i, j);
-                if (this.random.nextDouble() < 1d / (d.width * d.height))
+                if (this.random.nextDouble() < 1d / (d.width + d.height))
                     at = at < 0 ? this.random.nextInt(2) : -1;
                 grid[i - startI][j - startJ] = at;
             }

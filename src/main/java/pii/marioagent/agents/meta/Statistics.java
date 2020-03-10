@@ -13,11 +13,15 @@ import org.marioai.engine.core.MarioRender.AddedRender;
 
 import pii.marioagent.environnement.Description;
 import pii.marioagent.environnement.ForwardModel;
+import pii.marioagent.environnement.utils.TilePos;
 
 public class Statistics implements AddedRender {
 
     private float percent;
+
     private Description choice;
+    private TilePos choiceAt;
+
     private Description previous;
 
     private HashMap<Description, ArrayList<Float>> records;
@@ -59,9 +63,10 @@ public class Statistics implements AddedRender {
      * @param choices the description the agent found fitting.
      * @param which   the description the agent found most fitting.
      */
-    public void choiceReport(Description[] choices, int which) {
+    public void choiceReport(Description[] found, TilePos[] at, int choice) {
         this.previous = this.choice;
-        this.choice = choices[which];
+        this.choice = found[choice];
+        this.choiceAt = at[choice];
     }
 
     /**
@@ -70,7 +75,9 @@ public class Statistics implements AddedRender {
      * @param status the status to report.
      */
     public void statusReport(Statistics.Status status) {
-        ; // System.out.println(status + " reported");
+        // System.out.println(status + " reported");
+        if (status == Status.DEAD_END)
+            this.choice = null;
     }
 
     public enum Status {
@@ -125,11 +132,13 @@ public class Statistics implements AddedRender {
     @Override
     public void render(Graphics g, MarioRender r) {
         Description d = this.choice;
+
+        if (d == null) return;
+
         r.drawStringDropShadow(g, "Description tag: " + d.tag, 0, 1, 7);
         for (int i = 0; i < d.width; i++)
             for (int j = 0; j < d.height; j++)
-                if (d.getAt(i, j) != 0)
-                    r.drawStringDropShadow(g, d.getAt(i, j) < 0 ? "*" : "#", 2 * i, 2 * j, 7);
+                r.drawStringDropShadow(g, d.getAt(i, j) < 0 ? "?" : d.getAt(i, j) == 0 ? "-" : "X", 2 * (i + this.choiceAt.x), 2 * (j + this.choiceAt.y), 7);
     }
 
 }
