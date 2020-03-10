@@ -40,7 +40,7 @@ public class ExperimentAgent extends BaseAgent {
         X_DESCRIPTION // variation in description
     }
 
-    private Action alterAction(Description d) {
+    public Description alterAction(Description d) {
         Action action = d.getAction();
         action.reset();
 
@@ -58,7 +58,7 @@ public class ExperimentAgent extends BaseAgent {
         for (int k = 0; k < end + 1; k++) {
             boolean[] frame = action.consume();
             if (start - 1 < k) {
-                if (this.random.nextDouble() < .1f)
+                if (this.random.nextDouble() < 1d / action.length)
                     frame = this.random.nextInputs(frame);
                 inputs[before - start + k] = frame;
             }
@@ -72,7 +72,31 @@ public class ExperimentAgent extends BaseAgent {
         for (int k = before; 0 < k; k--)
             inputs[k - 1] = this.random.nextInputs(inputs[k]);
 
-        return new Action(inputs);
+        return this.prov.newDescription(d.getGrid(), d.getPreferredLocation(), new Action(inputs), TaskType.X_ACTION, d);
+    }
+
+    public Description alterDescription(Description d) {
+        int range = 2;
+        //int range = Math.min(Math.min((int) (d.width / 2), (int) (d.height / 2)), 2);
+
+        int startI = this.random.nextInt(range);
+        int endI = d.width - 1 - this.random.nextInt(range);
+
+        int startJ = this.random.nextInt(range);
+        int endJ = d.height - 1 - this.random.nextInt(range);
+
+        int[][] grid = new int[endI - startI][endJ - startJ];
+
+        for (int i = startI; i < endI; i++) {
+            for (int j = startJ; j < endJ; j++) {
+                int at = d.getAt(i, j);
+                if (this.random.nextDouble() < 1d / (d.width * d.height))
+                    at = at < 0 ? this.random.nextInt(2) : -1;
+                grid[i - startI][j - startJ] = at;
+            }
+        }
+
+        return this.prov.newDescription(grid, d.getPreferredLocation(), d.getAction(), TaskType.X_DESCRIPTION, d);
     }
 
     @Override
@@ -88,7 +112,12 @@ public class ExperimentAgent extends BaseAgent {
 
                 case X_ACTION:
                         base = this.prov.getFirst(1)[0];
-                        this.setCurrent(this.alterAction(base));
+                        this.setCurrent(this.alterAction(base).getAction());
+                    break;
+
+                case X_DESCRIPTION:
+                        base = this.prov.getFirst(1)[0];
+                        this.setCurrent(this.alterDescription(base).getAction());
                     break;
             }
 

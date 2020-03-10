@@ -101,7 +101,9 @@ public class Main {
                     // keep it for next turn
                     repo.add(it);
                     // experiment on it
-                    new ExperimentAgent(new RandomAction(5), new OneRepository(it), new Recorder(repo), TaskType.X_ACTION).run(TEST_LEVEL);
+                    ExperimentAgent expage = new ExperimentAgent(new RandomAction(5), new OneRepository(it), null, TaskType.X_ACTION);
+                    repo.add(expage.alterAction(it));
+                    repo.add(expage.alterDescription(it));
                 }
             }
 
