@@ -49,12 +49,11 @@ public class Main {
 
     public static void main(String[] args) throws IOException {
         FileRepository repo = new FileRepository();
-        FileRepository save = null;
 
         Graph graph = new SingleGraph("g1");
         graph.display(true);
 
-        for (int k = 0; k < 100; k++) {
+        for (int k = 0; k < 10; k++) {
             System.out.println("Iteration " + k + ".");
 
             // create a first agent to generate some descriptions
@@ -68,20 +67,10 @@ public class Main {
             List<Entry<Description, ArrayList<Float>>> bests = usage.getBests();
 
             for (Description it : repo.getFirst(repo.count())) {
-                boolean found = false;
-                for (Entry<Description, ArrayList<Float>> pair : bests)
-                    if (pair.getKey().tag == it.tag) {
-                        found = true;
-                        break;
-                    }
-                if (!found)
-                    Main.removeNode(graph, it);
-                else
-                    Main.addNode(graph, it);
+                Main.addNode(graph, it);
             }
 
-            save = new FileRepository();
-            repo = new FileRepository();
+            //repo = new FileRepository();
 
             // for each of the entries
             int c = 0;
@@ -93,36 +82,36 @@ public class Main {
                 it.setWeight(it.getWeight() + 10f / ++c);
                 //it.setWeight(it.getWeight() - ++c);
                 //it.setWeight(it.getWeight() + 1f / (it.getOccurences() + 1));
-                //it.setWeight(it.getWeight() + min);
+                //it.setWeight(it.getWeight() - min + max);
 
                 if (!Main.QUIET) System.out.print(it.tag + ": from " + min + " to " + max);
                 if (!Main.QUIET) System.out.println(" (" + it.getWeight() + " x " + it.getOccurences() + ")");
 
                 // if it helped
                 if (0 < min) {
-                    save.add(it);
                     // keep it for next turn
-                    repo.add(it);
+                    //repo.add(it);
                     // experiment on it
                     ExperimentAgent expage = new ExperimentAgent(new RandomAction(5), new OneRepository(it), null, TaskType.X_ACTION);
                     repo.add(expage.alterAction(it));
                     repo.add(expage.alterDescription(it));
+                } else {
+                    Main.removeNode(graph, it);
+                    repo.remove(it);
                 }
             }
-
-            //save.save(Paths.get("./run/it" + k + ".txt"));
 
             if (!Main.QUIET) System.out.println("\n");
         }
 
         //save.save(Paths.get("./save.txt"));
-        System.out.println("Repository size: " + save.count() + ".");
+        System.out.println("Repository size: " + repo.count() + ".");
 
         Graph newGraph = new SingleGraph("g2");
         newGraph.display(true);
 
         Statistics visual = new Statistics(newGraph);
-        new UseAgent(save, visual).run(Main.TEST_LEVEL, new AgentSettings(200), visual);
+        new UseAgent(repo, visual).run(Main.TEST_LEVEL, new AgentSettings(200), visual);
     }
 
 }

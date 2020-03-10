@@ -88,16 +88,17 @@ public class Statistics implements AddedRender {
      * @param which   the description the agent found most fitting.
      */
     public void choiceReport(Description[] found, TilePos[] at, int choice) {
-        if (this.graph != null)
+        if (this.graph != null) {
+            for (Node n : this.graph) n.removeAttribute("ui.color");
             if (this.choice != null) this.getOrAddNode(this.choice).setAttribute("ui.color", Color.RED); // red: used
+        }
 
         this.previous = this.choice;
         this.choice = found[choice];
         this.choiceAt = at[choice];
 
         if (this.graph != null) {
-            for (Description it : found)
-                if (it != null) this.getOrAddNode(it).setAttribute("ui.color", Color.BLUE); // blue: seen
+            for (Description d : found) if (d != null) this.getOrAddNode(d).setAttribute("ui.color", Color.BLUE); // blue: seen
             if (this.choice != null) this.getOrAddNode(this.choice).setAttribute("ui.color", Color.GREEN); // green: using
         }
     }
@@ -111,7 +112,7 @@ public class Statistics implements AddedRender {
         // System.out.println(status + " reported");
         if (status == Status.DEAD_END) {
             if (this.graph != null)
-                if (this.choice != null) this.getOrAddNode(this.choice).setAttribute("ui.color", Color.RED);
+                for (Node n : this.graph) n.removeAttribute("ui.color");
             this.choice = null;
         }
     }
