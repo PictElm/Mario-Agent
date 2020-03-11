@@ -44,7 +44,7 @@ public class TilePos {
 
     /**
      * Returns the euclidean distance of 2 tiles.
-     * <p>Calls {@link Math.sqrt}.
+     * <p> Calls {@link Math.sqrt}.
      * Prefer using {@see TilePos.distanceSq} when possible.
      * @param a tile 1.
      * @param b tile 2.

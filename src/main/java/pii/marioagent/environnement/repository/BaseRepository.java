@@ -17,6 +17,10 @@ public abstract class BaseRepository {
     public abstract void add(Description... des);
     public abstract void remove(Description... des);
 
+    /**
+     * Should return the total count of descriptions present in the repository.
+     * @return current number of descriptions.
+     */
     public abstract int count();
 
     /**
@@ -45,21 +49,28 @@ public abstract class BaseRepository {
         return this.getFirst(n, 0);
     }
 
+    /**
+     * Used to create a new Description object that won't interfere with any other by its tag.
+     * <p> The new Description has the provided one as parent.
+     * <p> Note: it is not expected to add the new object to the repository (check with re-implementation if any).
+     * @param grid Description's grid.
+     * @param location Description's preferred location.
+     * @param action Description's action.
+     * @param how the method that was used to generate this description.
+     * @param from the parent Description or null (in which case how is expected to be TaskType.GENERATE).
+     * @return a uniquely tagged new Description object.
+     */
     public Description newDescription(int[][] grid, TilePos location, Action action, TaskType how, Description from) {
         return new Description(grid, location, 0, 0, action, BaseRepository.newDescriptionTag(), how, from);
     }
 
     private static int descriptionTagCounter = -1;
     protected static final String newDescriptionTag() {
-        //char c = 26 * 26 < ++BaseRepository.descriptionTagCounter ? 'a' : 'A';
-        //return "" + (char) (c + (int) (BaseRepository.descriptionTagCounter / 26)) + (char) (c + (int) (BaseRepository.descriptionTagCounter % 26));
         return Integer.toHexString(++BaseRepository.descriptionTagCounter);
     }
 
     private static int actionTagCounter = -1;
     protected static final String newActionTag() {
-        //char c = 26 * 26 < ++BaseRepository.actionTagCounter ? 'a' : 'A';
-        //return "" + (char) (c + (int) (BaseRepository.actionTagCounter / 26)) + (char) (c + (int) (BaseRepository.actionTagCounter % 26));
         return Integer.toHexString(++BaseRepository.actionTagCounter);
     }
 

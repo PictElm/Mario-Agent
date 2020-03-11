@@ -1,5 +1,6 @@
 package pii.marioagent.agents.meta;
 
+import java.awt.Color;
 import java.awt.Graphics;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -8,6 +9,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.graphstream.graph.Graph;
+import org.graphstream.graph.Node;
 import org.marioai.engine.core.MarioRender;
 import org.marioai.engine.core.MarioRender.AddedRender;
 
@@ -26,8 +29,40 @@ public class Statistics implements AddedRender {
 
     private HashMap<Description, ArrayList<Float>> records;
 
+    private Graph graph;
+
     public Statistics() {
         this.records = new HashMap<>();
+    }
+
+    /**
+     * The provided graph is used to visualize the description used by the agent:
+     * <ul>
+     *   <li> a node colored in green has its action being used by the agent,
+     *   <li> a node colored in red had its action used,
+     *   <li> a node colored in blue represent a description found in the environnement,
+     *   <li> by default node are colored in black.
+     * </ul>
+     * If a description have a parent, it will be represented on the graph even if it isn't used (and thus recursively).
+     * @param graph
+     */
+    public Statistics(Graph graph) {
+        this();
+        this.graph = graph;
+        this.graph.addAttribute("ui.stylesheet", "node { fill-mode: dyn-plain; size: 15px; }");
+    }
+
+    private Node getOrAddNode(Description d) {
+        Node r = this.graph.getNode(d.tag);
+        if (r == null) {
+            r = this.graph.addNode(d.tag);
+            r.setAttribute("label", d.tag);
+
+            Description p = d.getFrom();
+            if (p != null)
+                this.graph.addEdge(p.tag + "-" + d.tag, this.getOrAddNode(p), r, true);
+        }
+        return r;
     }
 
     /**
@@ -64,9 +99,19 @@ public class Statistics implements AddedRender {
      * @param which   the description the agent found most fitting.
      */
     public void choiceReport(Description[] found, TilePos[] at, int choice) {
+        if (this.graph != null) {
+            for (Node n : this.graph) n.removeAttribute("ui.color");
+            if (this.choice != null) this.getOrAddNode(this.choice).setAttribute("ui.color", Color.RED); // red: used
+        }
+
         this.previous = this.choice;
         this.choice = found[choice];
         this.choiceAt = at[choice];
+
+        if (this.graph != null) {
+            for (Description d : found) if (d != null) this.getOrAddNode(d).setAttribute("ui.color", Color.BLUE); // blue: seen
+            if (this.choice != null) this.getOrAddNode(this.choice).setAttribute("ui.color", Color.GREEN); // green: using
+        }
     }
 
     /**
@@ -76,8 +121,11 @@ public class Statistics implements AddedRender {
      */
     public void statusReport(Statistics.Status status) {
         // System.out.println(status + " reported");
-        if (status == Status.DEAD_END)
+        if (status == Status.DEAD_END) {
+            if (this.graph != null)
+                for (Node n : this.graph) n.removeAttribute("ui.color");
             this.choice = null;
+        }
     }
 
     public enum Status {
@@ -129,6 +177,14 @@ public class Statistics implements AddedRender {
         return this.getBests().subList(0, n);
     }
 
+    /**
+     * Add to the game's display an "overlay" indicating the most resent choice the agent made to describe the environnement:
+     * <ul>
+     *   <li> a '-' represent a 0 (empty)
+     *   <li> a 'X' represent a 1 (wall)
+     *   <li> a '?' represent a -1 (any)
+     * </ul>
+     */
     @Override
     public void render(Graphics g, MarioRender r) {
         Description d = this.choice;

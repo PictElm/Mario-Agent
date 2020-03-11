@@ -5,7 +5,7 @@ import pii.marioagent.environnement.utils.TilePos;
 
 /**
  * Describes a part of the environnement.
- * <p>A table of ints and the associated location it is usually found at.
+ * <p> A table of ints and the associated location it is usually found at.
  */
 public class Description {
 

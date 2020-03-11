@@ -4,7 +4,7 @@ import org.marioai.engine.helper.MarioActions;
 
 /**
  * Contains a list of button to press.
- * <p>Each frame is as follow: { Left, Right, Down, Speed, Jump }.
+ * <p> Each frame is as follow: { Left, Right, Down, Speed, Jump }.
  */
 public class Action {
 

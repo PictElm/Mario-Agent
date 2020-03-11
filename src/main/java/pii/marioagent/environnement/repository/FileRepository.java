@@ -9,8 +9,8 @@ import pii.marioagent.environnement.Description;
 import pii.marioagent.environnement.utils.TilePos;
 
 /**
- * An implementation of the BaseRepository which loads from a file.
- * <p>Descriptions are stored as: <code>"gridStr|prefX|prefY|weight|occurences|actionStr"</code>
+ * An implementation of the ListRepository which loads from a file.
+ * <p> Descriptions are stored as: <code>"tag|gridStr|prefX|prefY|weight|occurences|actionStr"</code>
  */
 public class FileRepository extends ListRepository {
 

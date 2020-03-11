@@ -6,8 +6,7 @@ import java.util.Arrays;
 import pii.marioagent.environnement.Description;
 
 /**
- * An implementation of the BaseRepository which loads from a file.
- * <p>Descriptions are stored as: <code>"gridStr|prefX|prefY|weight|occurences|actionStr"</code>
+ * An implementation of the BaseRepository using a simple <code>ArrayList&lt;Description&gt;</code>.
  */
 public class ListRepository extends BaseRepository {
 

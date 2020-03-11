@@ -119,7 +119,7 @@ public class UseAgent extends BaseAgent {
      *   <li> weighting each description used,
      *   <li> picking the most valuated one.
      * </ul>
-     * <p>Pick is stored in this.current.
+     * <p> Pick is stored in this.current.
      * @param model access to game state.
      */
     protected void findNewAction(ForwardModel model) {
