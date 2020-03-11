@@ -18,19 +18,39 @@ public abstract class BaseAgent implements MarioAgent {
 
     private Action currentAction;
 
+    /**
+     * Get the ongoing action if any or null.
+     * @return the agent's action.
+     */
     protected Action getCurrent() {
         return this.currentAction;
     }
 
+    /**
+     * Set a new ongoing action.
+     * @param a action to be performed.
+     */
     protected void setCurrent(Action a) {
         a.reset();
         this.currentAction = a;
     }
 
+    /**
+     * Does the agent have an ongoing action?
+     * @return true if its the case.
+     */
     protected boolean hasCurrent() {
         return this.currentAction != null && !this.currentAction.finished();
     }
 
+    /**
+     * Runs the agent's algorithm on the level from the provided file path.
+     * <p> Settings from the agent itself are overridden by the provided ones.
+     * @param levelFile path to the file containing the level.
+     * @param settings the settings to use.
+     * @param visual object to add a visual information.
+     * @return the result of MarioGame.runGame.
+     */
     public MarioResult run(String levelFile, AgentSettings settings, AddedRender... visual) {
         try {
             String level = new String(Files.readAllBytes(Paths.get(levelFile)));
@@ -43,17 +63,30 @@ public abstract class BaseAgent implements MarioAgent {
         return null;
     }
 
+    /**
+     * Runs the agent's algorithm on the level from the provided file path.
+     * <p> Uses the settings provided by the agent's implementation itself.
+     * @see BaseAgent.run(String, AgentSettings, AddedRender...)
+     * @param levelFile path to the file containing the level.
+     * @param visual object to add a visual information.
+     * @return the result of MarioGame.runGame.
+     */
     public MarioResult run(String levelFile, AddedRender... visual) {
         return this.run(levelFile, this.getSettings(), visual);
     }
 
     /**
-     * Ask the agent for input given the game state.
+     * Asks the agent for input given the game state.
      * @param model access to game state.
      * @return inputs to perform as a boolean array (0: Left, Right, Down, Speed, Jump).
      */
     protected abstract boolean[] feed(ForwardModel model);
 
+    /**
+     * Asks the agent for the specific setting expected.
+     * @see BaseAgent.run(String, AddedRender...)
+     * @return the settings to use.
+     */
     protected abstract AgentSettings getSettings();
 
     @Override
@@ -85,10 +118,21 @@ public abstract class BaseAgent implements MarioAgent {
             this.startPercent = startPercent;
         }
 
+        /**
+         * Default marioState is 0
+         * @param timer
+         * @param startPercent
+         */
         public AgentSettings(int timer, float startPercent) {
             this(timer, startPercent, 0);
         }
 
+        /**
+         * Default marioState is 0
+         * Default startPercent is 'do not override' (reads from level)
+         * @param timer
+         * @param startPercent
+         */
         public AgentSettings(int timer) {
             this(timer, -1f);
         }

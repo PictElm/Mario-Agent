@@ -40,6 +40,11 @@ public class ExperimentAgent extends BaseAgent {
         X_DESCRIPTION // variation in description
     }
 
+    /**
+     * TODO: doc
+     * @param d
+     * @return
+     */
     public Description alterAction(Description d) {
         Action action = d.getAction();
         action.reset();
@@ -75,6 +80,11 @@ public class ExperimentAgent extends BaseAgent {
         return this.prov.newDescription(d.getGrid(), d.getPreferredLocation(), new Action(inputs), TaskType.X_ACTION, d);
     }
 
+    /**
+     * TODO: doc
+     * @param d
+     * @return
+     */
     public Description alterDescription(Description d) {
         //int range = 2;
         int range = Math.min(Math.min((int) (d.width / 2), (int) (d.height / 2)), 2);

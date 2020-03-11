@@ -35,6 +35,17 @@ public class Statistics implements AddedRender {
         this.records = new HashMap<>();
     }
 
+    /**
+     * The provided graph is used to visualize the description used by the agent:
+     * <ul>
+     *   <li> a node colored in green has its action being used by the agent,
+     *   <li> a node colored in red had its action used,
+     *   <li> a node colored in blue represent a description found in the environnement,
+     *   <li> by default node are colored in black.
+     * </ul>
+     * If a description have a parent, it will be represented on the graph even if it isn't used (and thus recursively).
+     * @param graph
+     */
     public Statistics(Graph graph) {
         this();
         this.graph = graph;
@@ -166,6 +177,14 @@ public class Statistics implements AddedRender {
         return this.getBests().subList(0, n);
     }
 
+    /**
+     * Add to the game's display an "overlay" indicating the most resent choice the agent made to describe the environnement:
+     * <ul>
+     *   <li> a '-' represent a 0 (empty)
+     *   <li> a 'X' represent a 1 (wall)
+     *   <li> a '?' represent a -1 (any)
+     * </ul>
+     */
     @Override
     public void render(Graphics g, MarioRender r) {
         Description d = this.choice;

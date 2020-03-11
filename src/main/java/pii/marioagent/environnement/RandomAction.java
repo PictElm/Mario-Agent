@@ -84,8 +84,8 @@ public class RandomAction extends Random {
     /**
      * Returns a new list of inputs following restrictions:
      * <ul>
-     *   <li>a button is more likely to keep its state from one frame the next
-     *   <li>right and left cannot be pressed at the same time
+     *   <li> a button is more likely to keep its state from one frame the next
+     *   <li> right and left cannot be pressed at the same time
      * </ul>
      * @return a random Action.
      */
