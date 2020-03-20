@@ -1,6 +1,7 @@
 package pii.marioagent.environnement;
 
-import pii.marioagent.agents.ExperimentAgent.TaskType;
+import java.util.ArrayList;
+
 import pii.marioagent.environnement.utils.TilePos;
 
 /**
@@ -17,15 +18,15 @@ public class Description {
 
     private final TilePos preferredLocation;
 
-    private final TaskType how;
-    private final Description from;
+    private final String how;
+    private final Description[] from;
 
     private float weight;
     private int occurences;
 
     private final Action action;
 
-    public Description(int[][] grid, TilePos preferred, float weight, int occurences, Action action, String tag, TaskType how, Description from) {
+    public Description(int[][] grid, TilePos preferred, float weight, int occurences, Action action, String tag, String how, Description... from) {
         this.tag = tag;
 
         this.width = grid.length;
@@ -44,7 +45,7 @@ public class Description {
     }
 
     public Description(int[][] grid, TilePos preferred, float weight, String tag) {
-        this(grid, preferred, weight, 0, new Action(), tag, TaskType.GENERATE, null);
+        this(grid, preferred, weight, 0, new Action(), tag, "generate");
     }
 
     /**
@@ -58,7 +59,7 @@ public class Description {
      * @param actionStr space-separated list of inputs.
      */
     public Description(String gridStr, int prefX, int prefY, float weight, int occurences, String actionStr, String tag) {
-        this(Description.parseGrid(gridStr), new TilePos(prefX, prefY), weight, occurences, new Action(actionStr), tag, TaskType.GENERATE, null);
+        this(Description.parseGrid(gridStr), new TilePos(prefX, prefY), weight, occurences, new Action(actionStr), tag, "generate");
     }
 
 
@@ -127,7 +128,7 @@ public class Description {
      * 
      * @return
      */
-    public Description getFrom() {
+    public Description[] getFrom() {
         return this.from;
     }
 
@@ -135,8 +136,35 @@ public class Description {
      * 
      * @return
      */
-    public TaskType getHow() {
+    public String getHow() {
         return this.how;
+    }
+
+    /**
+     * Tries to find a position at which the description's grid is a sub-matrix of the scene.
+     * @param scene a grid to search into.
+     * @return a TilePos at the position or null if not found.
+     */
+    public TilePos[] findInScene(int[][] scene) {
+        ArrayList<TilePos> r = new ArrayList<>();
+
+        for (int x = 0; x < scene.length - this.width + 1; x++) {
+            for (int y = 0; y < scene[x].length - this.height + 1; y++) {
+                int i = 0;
+                int j = 0;
+                while (scene[x + i][y + j] == this.getAt(i, j) || this.getAt(i, j) < 0) {
+                    if (this.height - 1 < ++j) {
+                        if (this.width - 1 < ++i) {
+                            r.add(new TilePos(x, y));
+                            break;
+                        }
+                        j = 0;
+                    }
+                }
+            }
+        }
+
+        return r.toArray(new TilePos[r.size()]);
     }
 
     @Override

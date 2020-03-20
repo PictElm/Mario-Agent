@@ -33,12 +33,12 @@ public class UseAgentTest {
     public void testFitDescription() {
 
         // d1 should be found once at (0, 2)
-        TilePos[] r1 = UseAgent.fitDescription(d1, scene);
+        TilePos[] r1 = d1.findInScene(scene);
         Assert.assertEquals(1, r1.length);
         Assert.assertEquals(new TilePos(0, 2), r1[0]);
 
         // d2 should be found twice at (0, 2) and (1, 2) -- in order of appearance
-        TilePos[] r2 = UseAgent.fitDescription(d2, scene);
+        TilePos[] r2 = d2.findInScene(scene);
         Assert.assertEquals(2, r2.length);
         Assert.assertEquals(new TilePos(0, 2), r2[0]);
         Assert.assertEquals(new TilePos(1, 2), r2[1]);

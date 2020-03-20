@@ -1,6 +1,5 @@
 package pii.marioagent.agents.meta;
 
-import pii.marioagent.agents.ExperimentAgent.TaskType;
 import pii.marioagent.environnement.Action;
 import pii.marioagent.environnement.Description;
 import pii.marioagent.environnement.ForwardModel;
@@ -20,8 +19,13 @@ public class Recorder {
      * @param action action that will be used.
      * @param model current environnement.
      */
-    public void feedAction(Action action, ForwardModel model, TaskType how, Description from) {
+    public void feedAction(Action action, ForwardModel model, String how, Description... from) {
         Description d = this.rec.newDescription(model.getScreenSceneObservation(), new TilePos(), action, how, from);
+        this.rec.add(d);
+    }
+
+    public void feedDescription(Description description, String how, Description... from) {
+        Description d = this.rec.newDescription(description.getGrid(), new TilePos(), description.getAction(), how, from);
         this.rec.add(d);
     }
 

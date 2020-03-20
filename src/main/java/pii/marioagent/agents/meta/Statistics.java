@@ -54,14 +54,16 @@ public class Statistics implements AddedRender {
 
     private Node getOrAddNode(Description d) {
         Node r = this.graph.getNode(d.tag);
+
         if (r == null) {
             r = this.graph.addNode(d.tag);
             r.setAttribute("label", d.tag);
 
-            Description p = d.getFrom();
-            if (p != null)
-                this.graph.addEdge(p.tag + "-" + d.tag, this.getOrAddNode(p), r, true);
+            if (d.getFrom() != null)
+                for (Description p : d.getFrom())
+                    this.graph.addEdge(p.tag + "-" + d.tag, this.getOrAddNode(p), r, true);
         }
+
         return r;
     }
 

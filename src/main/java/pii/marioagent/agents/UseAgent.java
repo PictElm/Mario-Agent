@@ -1,9 +1,9 @@
 package pii.marioagent.agents;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Queue;
 
+import pii.marioagent.Main;
 import pii.marioagent.agents.meta.Statistics;
 import pii.marioagent.environnement.Action;
 import pii.marioagent.environnement.Description;
@@ -29,34 +29,12 @@ public class UseAgent extends BaseAgent {
     }
 
     /**
-     * Tries to find a position at which the description's grid is a sub-matrix of the scene.
-     * @param d description which grid is to be found.
-     * @param scene a grid to search into.
-     * @return a TilePos at the position or null if not found.
+     * Local weight for a found description in the environnement (at fit) accounting for its preferred location.
+     * @param d
+     * @param fit
+     * @return
      */
-    protected static TilePos[] fitDescription(Description d, int[][] scene) {
-        ArrayList<TilePos> r = new ArrayList<>();
-
-        for (int x = 0; x < scene.length - d.width + 1; x++) {
-            for (int y = 0; y < scene[x].length - d.height + 1; y++) {
-                int i = 0;
-                int j = 0;
-                while (scene[x + i][y + j] == d.getAt(i, j) || d.getAt(i, j) < 0) {
-                    if (d.height - 1 < ++j) {
-                        if (d.width - 1 < ++i) {
-                            r.add(new TilePos(x, y));
-                            break;
-                        }
-                        j = 0;
-                    }
-                }
-            }
-        }
-
-        return r.toArray(new TilePos[r.size()]);
-    }
-
-    protected static float reWeight(Description d, TilePos fit) {
+    protected static float localWeight(Description d, TilePos fit) {
         return d.getWeight() / (TilePos.distanceSq(d.getPreferredLocation(), fit) + 1);
     }
 
@@ -92,18 +70,18 @@ public class UseAgent extends BaseAgent {
             if (next == null) break;
 
             // try to fit the description to the current scene
-            TilePos[] fittingPos = UseAgent.fitDescription(next, scene);
+            TilePos[] fittingPos = next.findInScene(scene);
             // if it's able to, complete the `to` list and re-evaluate weight with fit position
             if (0 < fittingPos.length) {
                 // find the best location for the description
                 int localBest = 0;
                 for (int k = 1; k < fittingPos.length; k++)
-                    if (UseAgent.reWeight(next, fittingPos[localBest]) < UseAgent.reWeight(next, fittingPos[k]))
+                    if (UseAgent.localWeight(next, fittingPos[localBest]) < UseAgent.localWeight(next, fittingPos[k]))
                         localBest = k;
 
                 to[fitted] = next;
                 at[fitted] = fittingPos[localBest];
-                r[fitted++] = UseAgent.reWeight(next, fittingPos[localBest]);
+                r[fitted++] = UseAgent.localWeight(next, fittingPos[localBest]);
             }
 
         // until enough descriptions are found to match requirement
@@ -166,7 +144,7 @@ public class UseAgent extends BaseAgent {
 
     @Override
     protected AgentSettings getSettings() {
-        return new AgentSettings(20);
+        return Main.SETTINGS.userAgentSettings;
     }
 
     @Override

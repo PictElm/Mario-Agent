@@ -3,7 +3,6 @@ package pii.marioagent.environnement.repository;
 import org.junit.Assert;
 import org.junit.Test;
 
-import pii.marioagent.agents.ExperimentAgent.TaskType;
 import pii.marioagent.environnement.Action;
 import pii.marioagent.environnement.Description;
 import pii.marioagent.environnement.utils.TilePos;
@@ -20,8 +19,7 @@ public class FileRepositoryTest {
             7,
             action,
             "tag",
-            TaskType.GENERATE,
-            null
+            "generate"
         );
 
         // should be able to save and retrieve:
