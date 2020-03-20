@@ -4,6 +4,7 @@ import pii.marioagent.agents.meta.Recorder;
 import pii.marioagent.environnement.Description;
 import pii.marioagent.environnement.ForwardModel;
 import pii.marioagent.environnement.RandomAction;
+import pii.marioagent.environnement.utils.TilePos;
 
 public class AlterDescriptionAgent extends BaseExperimentAgent {
 
@@ -17,9 +18,10 @@ public class AlterDescriptionAgent extends BaseExperimentAgent {
     /**
      * TODO: doc
      * @param d
+     * @param outNewPos
      * @return
      */
-    public int[][] alterDescription(Description d) {
+    public int[][] alterDescription(Description d, TilePos outNewPos) {
         //int range = 2;
         int range = Math.min(Math.min((int) (d.width / 2), (int) (d.height / 2)), 2);
 
@@ -34,18 +36,20 @@ public class AlterDescriptionAgent extends BaseExperimentAgent {
         for (int i = startI; i < endI; i++) {
             for (int j = startJ; j < endJ; j++) {
                 int at = d.getAt(i, j);
-                if (this.random.nextDouble() < 1d / (d.width + d.height))
+                if (this.random.nextDouble() < 1d / (d.width * d.height))
                     at = at < 0 ? this.random.nextInt(2) : -1;
                 grid[i - startI][j - startJ] = at;
             }
         }
 
+        outNewPos.x = d.getPreferredLocation().x + startI;
+        outNewPos.y = d.getPreferredLocation().y + startJ;
         return grid;
     }
 
     @Override
     protected String getExpName() {
-        return "alter action";
+        return "alter description";
     }
 
     @Override
@@ -55,8 +59,14 @@ public class AlterDescriptionAgent extends BaseExperimentAgent {
 
     @Override
     protected Description getExpResult(ForwardModel model, Description... from) {
-        int[][] r = this.alterDescription(from[0]);
-        return super.newDescription(r, from[0].getPreferredLocation(), from[0].getAction());
+        TilePos newPref = new TilePos();
+
+        int[][] scene = model.getScreenSceneObservation();
+        int[][] altered = this.alterDescription(from[0], newPref);
+
+        int[][] r = Description.cross(scene, altered, newPref, 0);
+
+        return super.newDescription(r, newPref, from[0].getAction());
     }
 
 }

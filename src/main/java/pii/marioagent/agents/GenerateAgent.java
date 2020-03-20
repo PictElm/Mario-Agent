@@ -22,7 +22,7 @@ public class GenerateAgent extends BaseAgent {
             this.setCurrent(this.random.nextAction());
 
             // record inputs
-            if (this.rec != null) this.rec.feedAction(this.getCurrent(), model, "generate", null);
+            if (this.rec != null) this.rec.feedAction(this.getCurrent(), model, "generate");
         }
 
         // consume the current action

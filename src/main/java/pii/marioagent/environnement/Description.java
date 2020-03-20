@@ -167,6 +167,42 @@ public class Description {
         return r.toArray(new TilePos[r.size()]);
     }
 
+    /**
+     * Return a grid according to the following rules:
+     * <ul>
+     *   <li> if this and mate have the same value, the result here is this value
+     *   <li> if this and mate have different values, or one is -1, the result here is:
+     *   <ul>
+     *     <li> if priority is -1, -1
+     *     <li> if priority is 0, this value
+     *     <li> if priority is 1, mate value
+     *   </ul>
+     * </ul>
+     * <p> Mate should be smaller, or the same size as this in both width and height.
+     * @param thisGrid the "this" grid to be used.
+     * @param mateGrid the "mate" grid to be used.
+     * @param offPos the offset position in accessing this grid.
+     * @param priority the priority behavior for non matching values.
+     * @return a new grid the size of mate.
+     */
+    public static int[][] cross(int[][] thisGrid, int[][] mateGrid, TilePos offPos, int priority) {
+        int[][] r = new int[mateGrid.length][mateGrid[0].length];
+
+        for (int i = 0; i < r.length; i++)
+            for (int j = 0; j < r[i].length; j++) {
+                int thisValue = thisGrid[i + offPos.x][j + offPos.y];
+                int mateValue = mateGrid[i][j];
+                int hereValue = mateValue;
+
+                if (thisValue != mateValue || thisValue < 0 || mateValue < 0)
+                    hereValue = priority < 0 ? -1 : priority == 0 ? thisValue : mateValue;
+
+                r[i][j] = hereValue;
+            }
+
+        return r;
+    }
+
     @Override
     public String toString() {
         StringBuilder r = new StringBuilder();

@@ -56,7 +56,7 @@ public abstract class BaseAgent implements MarioAgent {
         try {
             String level = new String(Files.readAllBytes(Paths.get(levelFile)));
 
-            MarioGame game = settings.overrideStart ? new MarioGame(settings.startPercent < 0 ? Main.SETTINGS.random() : settings.startPercent, visual) : new MarioGame(visual);
+            MarioGame game = settings.overrideStart ? new MarioGame(1 < settings.startPercent ? Main.SETTINGS.random() : settings.startPercent, visual) : new MarioGame(visual);
             return game.runGame(this, level, settings.timer, settings.marioState, 0 < visual.length);
         } catch (IOException e) {
             e.printStackTrace();

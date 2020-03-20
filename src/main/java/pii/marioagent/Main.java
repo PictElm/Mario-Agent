@@ -1,6 +1,7 @@
 package pii.marioagent;
 
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -12,6 +13,8 @@ import org.graphstream.graph.implementations.SingleGraph;
 import pii.marioagent.agents.BaseAgent;
 import pii.marioagent.agents.GenerateAgent;
 import pii.marioagent.agents.UseAgent;
+import pii.marioagent.agents.experiment.AlterActionAgent;
+import pii.marioagent.agents.experiment.AlterDescriptionAgent;
 import pii.marioagent.agents.meta.Recorder;
 import pii.marioagent.agents.meta.Statistics;
 import pii.marioagent.environnement.Description;
@@ -56,6 +59,12 @@ public class Main {
                 if (0 < min) {
                     // experiment on it
                     RandomAction randomActionExperiment = new RandomAction(Main.SETTINGS.randomActionExperimentMinMax[0], Main.SETTINGS.randomActionExperimentMinMax[1]);
+
+                    BaseAgent alterAction = new AlterActionAgent(randomActionExperiment, new Recorder(repo), it);
+                    alterAction.run(Main.SETTINGS.testLevelFilePath);
+
+                    BaseAgent alterDescription = new AlterDescriptionAgent(randomActionExperiment, new Recorder(repo), it);
+                    alterDescription.run(Main.SETTINGS.testLevelFilePath);
                 } else {
                     // otherwise remove it
                     repo.remove(it);
@@ -66,6 +75,7 @@ public class Main {
         }
 
         System.out.println("Repository size: " + repo.count() + ".");
+        repo.save(Paths.get("./repo.save.txt"));
 
         Graph graph = new SingleGraph("Descriptions Used");
         graph.display(true);

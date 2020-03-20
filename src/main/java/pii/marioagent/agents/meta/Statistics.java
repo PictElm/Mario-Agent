@@ -110,6 +110,8 @@ public class Statistics implements AddedRender {
         this.choice = found[choice];
         this.choiceAt = at[choice];
 
+        //System.out.println("Usage of '" + this.choice.tag + "'");
+
         if (this.graph != null) {
             for (Description d : found) if (d != null) this.getOrAddNode(d).setAttribute("ui.color", Color.BLUE); // blue: seen
             if (this.choice != null) this.getOrAddNode(this.choice).setAttribute("ui.color", Color.GREEN); // green: using

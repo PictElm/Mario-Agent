@@ -22,7 +22,7 @@ public class ListRepository extends BaseRepository {
 
     protected void sort() {
         if (!this.sorted)
-            this.data.sort((Description e1, Description e2) -> (int) (e2.getWeight() - e1.getWeight()));
+            this.data.sort((Description e1, Description e2) -> (int) Math.signum(e2.getWeight() - e1.getWeight()));
         this.sorted = true;
     }
 
