@@ -57,25 +57,27 @@ public class ListRepository extends BaseRepository {
 
     /**
      * Trim the unvalued element at the end of the repository.
-     * @param ratio from 1 to trim all to 0 to trim nothing (e.g.: .5f will keep half of the unvalued elements)
+     * @param ratio from 1 to trim all to 0 to trim nothing (e.g.: .5f will keep half of the unvalued elements).
+     * @param occurred if true, only keeps element with a non-zero occurences count.
      * @return how many elements where removed.
      */
-    public int trim(float ratio) {
+    public int trim(float ratio, boolean occurred) {
         if (!this.sorted) this.sort();
 
         int uslFrom = 0;
         while (0 < this.data.get(uslFrom++).getWeight());
         uslFrom+= (int) ((this.data.size() - uslFrom) * (1f - ratio));
 
-        int r = this.data.size() - uslFrom;
+        int pSize = this.data.size();
 
         Object[] selected = this.data.subList(0, uslFrom).toArray();
         this.data.clear();
 
         for (Object it : selected)
-            this.data.add((Description) it);
+            if (!occurred || 0 < ((Description) it).getOccurences())
+                this.data.add((Description) it);
 
-        return r;
+        return pSize - this.data.size();
     }
 
 }

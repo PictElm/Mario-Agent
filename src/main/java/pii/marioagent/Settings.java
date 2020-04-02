@@ -66,9 +66,9 @@ public class Settings {
             (Description it, Object... args) -> it.getWeight() - (float) args[0] /*min*/ + (float) args[1] /*max*/,
             new AlterationSettings(),
 
-            new AgentSettings(20),
-            new AgentSettings(5, 2 /* > 1 so that it will use random */),
-            new AgentSettings(200),
+            new AgentSettings(20, 2),
+            new AgentSettings(10, 2 /* > 1 so that it will use random */),
+            new AgentSettings(800),
             new AgentSettings(200)
         );
     }

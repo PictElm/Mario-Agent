@@ -23,7 +23,7 @@ import pii.marioagent.environnement.repository.FileRepository;
 
 public class Main {
 
-    public static final boolean TRAIN = false;
+    public static final boolean TRAIN = true;
     public static final boolean LOAD = true;
     public static final Settings SETTINGS = new Settings("./src/main/resources/levels/without-gaps.txt", "");
     public static final boolean QUIET = true;
@@ -80,7 +80,7 @@ public class Main {
 
         System.out.println("Repository size: " + repo.count() + ".");
         if (Main.TRAIN) {
-            System.out.println("Trimmed " + repo.trim(0f) + " unvalued elements.");
+            System.out.println("Trimmed " + repo.trim(0f, true) + " unvalued elements.");
             repo.save(Paths.get(Main.SETTINGS.descRepoFilePath));
         }
 
