@@ -25,7 +25,7 @@ public class Recorder {
     }
 
     public void feedDescription(Description description, String how, Description... from) {
-        Description d = this.rec.newDescription(description.getGrid(), new TilePos(), description.getAction(), how, from);
+        Description d = this.rec.newDescription(description.getGrid(), description.getPreferredLocation(), description.getAction(), how, from);
         this.rec.add(d);
     }
 

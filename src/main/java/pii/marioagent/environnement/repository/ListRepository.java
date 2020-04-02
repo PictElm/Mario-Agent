@@ -2,6 +2,7 @@ package pii.marioagent.environnement.repository;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import pii.marioagent.environnement.Description;
 
@@ -53,6 +54,29 @@ public class ListRepository extends BaseRepository {
     @Override
     public int count() {
         return this.data.size();
+    }
+
+    /**
+     * Trim the unvalued element at the end of the repository.
+     * @param ratio from 1 to trim all to 0 to trim nothing (e.g.: .5f will keep half of the unvalued elements)
+     * @return how many elements where removed.
+     */
+    public int trim(float ratio) {
+        if (!this.sorted) this.sort();
+
+        int uslFrom = 0;
+        while (0 < this.data.get(uslFrom++).getWeight());
+        uslFrom+= (int) ((this.data.size() - uslFrom) * (1f - ratio));
+
+        int r = this.data.size() - uslFrom;
+
+        Object[] selected = this.data.subList(0, uslFrom).toArray();
+        this.data.clear();
+
+        for (Object it : selected)
+            this.data.add((Description) it);
+
+        return r;
     }
 
 }
