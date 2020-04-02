@@ -187,6 +187,7 @@ public class Statistics implements AddedRender {
      *   <li> a '-' represent a 0 (empty)
      *   <li> a 'X' represent a 1 (wall)
      *   <li> a '?' represent a -1 (any)
+     *   <li> a '#' represent the preferred location
      * </ul>
      */
     @Override
@@ -199,6 +200,9 @@ public class Statistics implements AddedRender {
         for (int i = 0; i < d.width; i++)
             for (int j = 0; j < d.height; j++)
                 r.drawStringDropShadow(g, d.getAt(i, j) < 0 ? "?" : d.getAt(i, j) == 0 ? "-" : "X", 2 * (i + this.choiceAt.x), 2 * (j + this.choiceAt.y), 7);
+
+        TilePos at = d.getPreferredLocation();
+        r.drawStringDropShadow(g, "#", 2 * at.x, 2 * at.y, 5);
     }
 
 }

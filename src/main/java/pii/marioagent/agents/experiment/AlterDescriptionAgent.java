@@ -1,5 +1,6 @@
 package pii.marioagent.agents.experiment;
 
+import pii.marioagent.Main;
 import pii.marioagent.agents.meta.Recorder;
 import pii.marioagent.environnement.Description;
 import pii.marioagent.environnement.ForwardModel;
@@ -22,8 +23,8 @@ public class AlterDescriptionAgent extends BaseExperimentAgent {
      * @return
      */
     public int[][] alterDescription(Description d, TilePos outNewPos) {
-        //int range = 2;
-        int range = Math.min(Math.min((int) (d.width / 2), (int) (d.height / 2)), 2);
+        int range = Math.min(Math.min((int) (d.width / 2f), (int) (d.height / 2f)), 2);
+        //if (range == 0) return d.getGrid();
 
         int startI = this.random.nextInt(range);
         int endI = d.width - 1 - this.random.nextInt(range);
@@ -36,14 +37,16 @@ public class AlterDescriptionAgent extends BaseExperimentAgent {
         for (int i = startI; i < endI; i++) {
             for (int j = startJ; j < endJ; j++) {
                 int at = d.getAt(i, j);
-                if (this.random.nextDouble() < 1d / (d.width * d.height))
+                if (this.random.nextDouble() < Main.SETTINGS.alter.descriptionMutationRate / (d.width * d.height))
                     at = at < 0 ? this.random.nextInt(2) : -1;
                 grid[i - startI][j - startJ] = at;
             }
         }
 
-        outNewPos.x = d.getPreferredLocation().x + startI;
-        outNewPos.y = d.getPreferredLocation().y + startJ;
+        TilePos initialPos = d.getPreferredLocation();
+        outNewPos.x = initialPos.x + startI;
+        outNewPos.y = initialPos.y + startJ;
+
         return grid;
     }
 
@@ -64,7 +67,13 @@ public class AlterDescriptionAgent extends BaseExperimentAgent {
         int[][] scene = model.getScreenSceneObservation();
         int[][] altered = this.alterDescription(from[0], newPref);
 
-        int[][] r = Description.cross(scene, altered, newPref, 0);
+        int[][] r = altered;
+        if (Main.SETTINGS.alter.descriptionCrossDirection != 0) {
+            if (0 < Main.SETTINGS.alter.descriptionCrossDirection)
+                r = Description.cross(scene, altered, newPref, Main.SETTINGS.alter.descriptionCrossPriority);
+            else
+                r = Description.cross(altered, scene, newPref, Main.SETTINGS.alter.descriptionCrossPriority);
+        }
 
         return super.newDescription(r, newPref, from[0].getAction());
     }

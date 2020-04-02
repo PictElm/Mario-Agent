@@ -1,5 +1,6 @@
 package pii.marioagent.agents.experiment;
 
+import pii.marioagent.Main;
 import pii.marioagent.agents.meta.Recorder;
 import pii.marioagent.environnement.Action;
 import pii.marioagent.environnement.Description;
@@ -25,7 +26,7 @@ public class AlterActionAgent extends BaseExperimentAgent {
         Action action = d.getAction();
         action.reset();
 
-        int range = Math.min((int) (action.length / 2), 10);
+        int range = Math.min((int) (action.length / 2f), 10);
 
         int before = this.random.nextInt(range);
         int after = this.random.nextInt(range);
@@ -36,11 +37,18 @@ public class AlterActionAgent extends BaseExperimentAgent {
         boolean[][] inputs = new boolean[before + (end - start + 1) + after][];
 
         // copy from `start` to `end` (offset by `before`)
+        boolean isPrevRandom = false;
         for (int k = 0; k < end + 1; k++) {
             boolean[] frame = action.consume();
             if (start - 1 < k) {
-                if (this.random.nextDouble() < 1d / action.length)
+                double r = this.random.nextDouble();
+                boolean isNewRandom = isPrevRandom && r < Main.SETTINGS.alter.actionMutationPropagate
+                        || r < Main.SETTINGS.alter.actionMutationRate / action.length;
+
+                if (isNewRandom)
                     frame = this.random.nextInputs(frame);
+                isPrevRandom = isNewRandom;
+
                 inputs[before - start + k] = frame;
             }
         }
