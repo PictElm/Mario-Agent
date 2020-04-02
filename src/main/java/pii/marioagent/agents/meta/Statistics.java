@@ -199,6 +199,9 @@ public class Statistics implements AddedRender {
         for (int i = 0; i < d.width; i++)
             for (int j = 0; j < d.height; j++)
                 r.drawStringDropShadow(g, d.getAt(i, j) < 0 ? "?" : d.getAt(i, j) == 0 ? "-" : "X", 2 * (i + this.choiceAt.x), 2 * (j + this.choiceAt.y), 7);
+
+        TilePos at = d.getPreferredLocation();
+        r.drawStringDropShadow(g, "#", 2 * at.x, 2 * at.y, 5);
     }
 
 }

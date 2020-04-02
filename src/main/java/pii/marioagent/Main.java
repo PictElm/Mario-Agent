@@ -23,12 +23,16 @@ import pii.marioagent.environnement.repository.FileRepository;
 
 public class Main {
 
-    public static final Settings SETTINGS = new Settings();
+    public static final boolean TRAIN = true;
+    public static final boolean LOAD = false;
+    public static final Settings SETTINGS = new Settings("./src/main/resources/levels/test2.txt", "");
     public static final boolean QUIET = true;
 
     public static void main(String[] args) throws IOException {
         FileRepository repo = new FileRepository();
+        if (Main.LOAD) repo.load(Paths.get(Main.SETTINGS.descRepoFilePath));
 
+        if (Main.TRAIN)
         for (int k = 0; k < Main.SETTINGS.trainingIterationCount; k++) {
             System.out.println("Iteration " + k + ".");
 
@@ -75,7 +79,7 @@ public class Main {
         }
 
         System.out.println("Repository size: " + repo.count() + ".");
-        repo.save(Paths.get("./repo.save.txt"));
+        if (Main.TRAIN) repo.save(Paths.get(Main.SETTINGS.descRepoFilePath));
 
         Graph graph = new SingleGraph("Descriptions Used");
         graph.display(true);

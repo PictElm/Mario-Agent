@@ -30,7 +30,7 @@ public class FileRepositoryTest {
         //  - action
         //  - tag
         String save = FileRepository.getStringDump(test);
-        Description d = FileRepository.getDecriptionLoad(save);
+        Description d = FileRepository.getDescriptionLoad(save);
 
         Assert.assertArrayEquals(new int[][] { { 1, 0 }, { 0, -1 } }, d.getGrid());
         Assert.assertEquals(new TilePos(4, 2), d.getPreferredLocation());

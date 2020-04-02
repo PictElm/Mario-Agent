@@ -23,7 +23,9 @@ public class AlterDescriptionAgent extends BaseExperimentAgent {
      */
     public int[][] alterDescription(Description d, TilePos outNewPos) {
         //int range = 2;
-        int range = Math.min(Math.min((int) (d.width / 2), (int) (d.height / 2)), 2);
+        int range = Math.min(Math.min((int) (d.width / 2f), (int) (d.height / 2f)), 2);
+
+        if (range == 0) return d.getGrid();
 
         int startI = this.random.nextInt(range);
         int endI = d.width - 1 - this.random.nextInt(range);
@@ -64,7 +66,7 @@ public class AlterDescriptionAgent extends BaseExperimentAgent {
         int[][] scene = model.getScreenSceneObservation();
         int[][] altered = this.alterDescription(from[0], newPref);
 
-        int[][] r = Description.cross(scene, altered, newPref, 0);
+        int[][] r = altered; //Description.cross(scene, altered, newPref, 0);
 
         return super.newDescription(r, newPref, from[0].getAction());
     }

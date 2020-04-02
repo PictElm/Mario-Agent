@@ -25,7 +25,7 @@ public class AlterActionAgent extends BaseExperimentAgent {
         Action action = d.getAction();
         action.reset();
 
-        int range = Math.min((int) (action.length / 2), 10);
+        int range = Math.min((int) (action.length / 2f), 10);
 
         int before = this.random.nextInt(range);
         int after = this.random.nextInt(range);

@@ -42,6 +42,11 @@ public class Description {
 
         this.how = how;
         this.from = from;
+
+        float s = 0;
+        for (Description d : from)
+            s+= d.weight;
+        this.weight+= s;
     }
 
     public Description(int[][] grid, TilePos preferred, float weight, String tag) {

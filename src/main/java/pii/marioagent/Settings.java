@@ -12,6 +12,7 @@ public class Settings {
     public final Random random;
 
     public final String testLevelFilePath;
+    public final String descRepoFilePath;
     public final int trainingIterationCount;
 
     public final int[] randomActionGenerateMinMax;
@@ -25,8 +26,9 @@ public class Settings {
     public final AgentSettings userAgentSettings;
     public final AgentSettings trainedAgentSettings;
 
-    public Settings(Random random, String testLevelFilePath, int trainingIterationCount, int[] randomActionGenerateMinMax, int[] randomActionExperimentMinMax, int numberOfAction, ReWeighter reWeighter, AgentSettings... agentSettings) {
+    public Settings(Random random, String testLevelFilePath, String descRepoFilePath, int trainingIterationCount, int[] randomActionGenerateMinMax, int[] randomActionExperimentMinMax, int numberOfAction, ReWeighter reWeighter, AgentSettings... agentSettings) {
         this.testLevelFilePath = testLevelFilePath;
+        this.descRepoFilePath = descRepoFilePath;
         this.trainingIterationCount = trainingIterationCount;
 
         this.randomActionGenerateMinMax = randomActionGenerateMinMax;
@@ -43,6 +45,27 @@ public class Settings {
         this.random = random;
     }
 
+    public Settings(String testLevelFilePath, String descRepoFilePath) {
+        this(
+            new Random(),
+
+            !testLevelFilePath.equals("") ? testLevelFilePath : "./src/main/resources/levels/test.txt",
+            !descRepoFilePath.equals("") ? descRepoFilePath : "./repo_save.txt",
+            100,
+
+            new int[] { 30, 30 + 1 },
+            new int[] { 5, 5 + 1 },
+            MarioActions.numberOfActions(),
+
+            (Description it, Object... args) -> it.getWeight() + (float) args[0] /*min*/, // + (float) args[1] /*max*/,
+
+            new AgentSettings(20),
+            new AgentSettings(5, 2 /* > 1 so that it will use random */),
+            new AgentSettings(20),
+            new AgentSettings(200)
+        );
+    }
+
     /**
      * previously used settings, as defaults
      */
@@ -51,6 +74,7 @@ public class Settings {
             new Random(),
 
             "./src/main/resources/levels/test.txt",
+            "./repo_save.txt",
             50,
 
             new int[] { 30, 30 + 1 },
