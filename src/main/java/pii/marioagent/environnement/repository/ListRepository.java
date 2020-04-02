@@ -2,7 +2,6 @@ package pii.marioagent.environnement.repository;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 import pii.marioagent.environnement.Description;
 

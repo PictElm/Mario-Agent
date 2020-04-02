@@ -23,8 +23,8 @@ import pii.marioagent.environnement.repository.FileRepository;
 
 public class Main {
 
-    public static final boolean TRAIN = true;
-    public static final boolean LOAD = false;
+    public static final boolean TRAIN = false;
+    public static final boolean LOAD = true;
     public static final Settings SETTINGS = new Settings("./src/main/resources/levels/without-gaps.txt", "");
     public static final boolean QUIET = true;
 

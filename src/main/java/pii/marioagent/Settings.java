@@ -56,7 +56,7 @@ public class Settings {
             new Random(),
 
             !testLevelFilePath.equals("") ? testLevelFilePath : "./src/main/resources/levels/test.txt",
-            !descRepoFilePath.equals("") ? descRepoFilePath : "./repo_save.txt",
+            !descRepoFilePath.equals("") ? descRepoFilePath : "./repo_save.csv",
             50,
 
             new int[] { 30, 30 + 1 },
@@ -68,7 +68,7 @@ public class Settings {
 
             new AgentSettings(20),
             new AgentSettings(5, 2 /* > 1 so that it will use random */),
-            new AgentSettings(20),
+            new AgentSettings(200),
             new AgentSettings(200)
         );
     }
