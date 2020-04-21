@@ -22,7 +22,7 @@ public class ListRepository extends BaseRepository {
 
     protected void sort() {
         if (!this.sorted)
-            this.data.sort((Description e1, Description e2) -> (int) (e2.getWeight() - e1.getWeight()));
+            this.data.sort((Description e1, Description e2) -> (int) Math.signum(e2.getWeight() - e1.getWeight()));
         this.sorted = true;
     }
 
@@ -53,6 +53,31 @@ public class ListRepository extends BaseRepository {
     @Override
     public int count() {
         return this.data.size();
+    }
+
+    /**
+     * Trim the unvalued element at the end of the repository.
+     * @param ratio from 1 to trim all to 0 to trim nothing (e.g.: .5f will keep half of the unvalued elements).
+     * @param occurred if true, only keeps element with a non-zero occurences count.
+     * @return how many elements where removed.
+     */
+    public int trim(float ratio, boolean occurred) {
+        if (!this.sorted) this.sort();
+
+        int uslFrom = 0;
+        while (0 < this.data.get(uslFrom++).getWeight());
+        uslFrom+= (int) ((this.data.size() - uslFrom) * (1f - ratio));
+
+        int pSize = this.data.size();
+
+        Object[] selected = this.data.subList(0, uslFrom).toArray();
+        this.data.clear();
+
+        for (Object it : selected)
+            if (!occurred || 0 < ((Description) it).getOccurences())
+                this.data.add((Description) it);
+
+        return pSize - this.data.size();
     }
 
 }

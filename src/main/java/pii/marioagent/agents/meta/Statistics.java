@@ -54,14 +54,16 @@ public class Statistics implements AddedRender {
 
     private Node getOrAddNode(Description d) {
         Node r = this.graph.getNode(d.tag);
+
         if (r == null) {
             r = this.graph.addNode(d.tag);
             r.setAttribute("label", d.tag);
 
-            Description p = d.getFrom();
-            if (p != null)
-                this.graph.addEdge(p.tag + "-" + d.tag, this.getOrAddNode(p), r, true);
+            if (d.getFrom() != null)
+                for (Description p : d.getFrom())
+                    this.graph.addEdge(p.tag + "-" + d.tag, this.getOrAddNode(p), r, true);
         }
+
         return r;
     }
 
@@ -107,6 +109,8 @@ public class Statistics implements AddedRender {
         this.previous = this.choice;
         this.choice = found[choice];
         this.choiceAt = at[choice];
+
+        //System.out.println("Usage of '" + this.choice.tag + "'");
 
         if (this.graph != null) {
             for (Description d : found) if (d != null) this.getOrAddNode(d).setAttribute("ui.color", Color.BLUE); // blue: seen
@@ -183,6 +187,7 @@ public class Statistics implements AddedRender {
      *   <li> a '-' represent a 0 (empty)
      *   <li> a 'X' represent a 1 (wall)
      *   <li> a '?' represent a -1 (any)
+     *   <li> a '#' represent the preferred location
      * </ul>
      */
     @Override
@@ -195,6 +200,9 @@ public class Statistics implements AddedRender {
         for (int i = 0; i < d.width; i++)
             for (int j = 0; j < d.height; j++)
                 r.drawStringDropShadow(g, d.getAt(i, j) < 0 ? "?" : d.getAt(i, j) == 0 ? "-" : "X", 2 * (i + this.choiceAt.x), 2 * (j + this.choiceAt.y), 7);
+
+        TilePos at = d.getPreferredLocation();
+        r.drawStringDropShadow(g, "#", 2 * at.x, 2 * at.y, 5);
     }
 
 }

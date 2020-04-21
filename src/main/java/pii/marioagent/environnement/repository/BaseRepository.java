@@ -1,6 +1,5 @@
 package pii.marioagent.environnement.repository;
 
-import pii.marioagent.agents.ExperimentAgent.TaskType;
 import pii.marioagent.environnement.Action;
 import pii.marioagent.environnement.Description;
 import pii.marioagent.environnement.utils.TilePos;
@@ -57,10 +56,10 @@ public abstract class BaseRepository {
      * @param location Description's preferred location.
      * @param action Description's action.
      * @param how the method that was used to generate this description.
-     * @param from the parent Description or null (in which case how is expected to be TaskType.GENERATE).
+     * @param from the parent Description or null (in which case how is expected to be TaskType.generate).
      * @return a uniquely tagged new Description object.
      */
-    public Description newDescription(int[][] grid, TilePos location, Action action, TaskType how, Description from) {
+    public Description newDescription(int[][] grid, TilePos location, Action action, String how, Description... from) {
         return new Description(grid, location, 0, 0, action, BaseRepository.newDescriptionTag(), how, from);
     }
 

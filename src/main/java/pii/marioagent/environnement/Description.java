@@ -1,6 +1,7 @@
 package pii.marioagent.environnement;
 
-import pii.marioagent.agents.ExperimentAgent.TaskType;
+import java.util.ArrayList;
+
 import pii.marioagent.environnement.utils.TilePos;
 
 /**
@@ -17,15 +18,15 @@ public class Description {
 
     private final TilePos preferredLocation;
 
-    private final TaskType how;
-    private final Description from;
+    private final String how;
+    private final Description[] from;
 
     private float weight;
     private int occurences;
 
     private final Action action;
 
-    public Description(int[][] grid, TilePos preferred, float weight, int occurences, Action action, String tag, TaskType how, Description from) {
+    public Description(int[][] grid, TilePos preferred, float weight, int occurences, Action action, String tag, String how, Description... from) {
         this.tag = tag;
 
         this.width = grid.length;
@@ -44,7 +45,7 @@ public class Description {
     }
 
     public Description(int[][] grid, TilePos preferred, float weight, String tag) {
-        this(grid, preferred, weight, 0, new Action(), tag, TaskType.GENERATE, null);
+        this(grid, preferred, weight, 0, new Action(), tag, "generate");
     }
 
     /**
@@ -58,7 +59,7 @@ public class Description {
      * @param actionStr space-separated list of inputs.
      */
     public Description(String gridStr, int prefX, int prefY, float weight, int occurences, String actionStr, String tag) {
-        this(Description.parseGrid(gridStr), new TilePos(prefX, prefY), weight, occurences, new Action(actionStr), tag, TaskType.GENERATE, null);
+        this(Description.parseGrid(gridStr), new TilePos(prefX, prefY), weight, occurences, new Action(actionStr), tag, "generate");
     }
 
 
@@ -127,7 +128,7 @@ public class Description {
      * 
      * @return
      */
-    public Description getFrom() {
+    public Description[] getFrom() {
         return this.from;
     }
 
@@ -135,8 +136,71 @@ public class Description {
      * 
      * @return
      */
-    public TaskType getHow() {
+    public String getHow() {
         return this.how;
+    }
+
+    /**
+     * Tries to find a position at which the description's grid is a sub-matrix of the scene.
+     * @param scene a grid to search into.
+     * @return a TilePos at the position or null if not found.
+     */
+    public TilePos[] findInScene(int[][] scene) {
+        ArrayList<TilePos> r = new ArrayList<>();
+
+        for (int x = 0; x < scene.length - this.width + 1; x++) {
+            for (int y = 0; y < scene[x].length - this.height + 1; y++) {
+                int i = 0;
+                int j = 0;
+                while (scene[x + i][y + j] == this.getAt(i, j) || this.getAt(i, j) < 0) {
+                    if (this.height - 1 < ++j) {
+                        if (this.width - 1 < ++i) {
+                            r.add(new TilePos(x, y));
+                            break;
+                        }
+                        j = 0;
+                    }
+                }
+            }
+        }
+
+        return r.toArray(new TilePos[r.size()]);
+    }
+
+    /**
+     * Return a grid according to the following rules:
+     * <ul>
+     *   <li> if this and mate have the same value, the result here is this value
+     *   <li> if this and mate have different values, or one is -1, the result here is:
+     *   <ul>
+     *     <li> if priority is -1, -1
+     *     <li> if priority is 0, this value
+     *     <li> if priority is 1, mate value
+     *   </ul>
+     * </ul>
+     * <p> Mate should be smaller, or the same size as this in both width and height.
+     * @param thisGrid the "this" grid to be used.
+     * @param mateGrid the "mate" grid to be used.
+     * @param offPos the offset position in accessing this grid.
+     * @param priority the priority behavior for non matching values.
+     * @return a new grid the size of mate.
+     */
+    public static int[][] cross(int[][] thisGrid, int[][] mateGrid, TilePos offPos, int priority) {
+        int[][] r = new int[mateGrid.length][mateGrid[0].length];
+
+        for (int i = 0; i < r.length; i++)
+            for (int j = 0; j < r[i].length; j++) {
+                int thisValue = thisGrid[i + offPos.x][j + offPos.y];
+                int mateValue = mateGrid[i][j];
+                int hereValue = mateValue;
+
+                if (thisValue != mateValue || thisValue < 0 || mateValue < 0)
+                    hereValue = priority < 0 ? -1 : priority == 0 ? thisValue : mateValue;
+
+                r[i][j] = hereValue;
+            }
+
+        return r;
     }
 
     @Override
