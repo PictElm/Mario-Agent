@@ -68,7 +68,7 @@ public class Settings {
 
             new AgentSettings(20, 2),
             new AgentSettings(10, 2 /* > 1 so that it will use random */),
-            new AgentSettings(800),
+            new AgentSettings(100),
             new AgentSettings(200)
         );
     }
